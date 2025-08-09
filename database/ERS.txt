@@ -1,0 +1,76 @@
+CREATE TABLE Users (
+  UserId INT IDENTITY(1,1) PRIMARY KEY,
+  Email NVARCHAR(256) NOT NULL UNIQUE,
+  PasswordHash NVARCHAR(512) NOT NULL,
+  [IsEmailVerified] BIT NOT NULL DEFAULT 0,
+  [VerificationToken] NVARCHAR(255) NULL,        
+  [VerificationTokenExpires] DATETIME NULL,        
+  [PasswordResetToken] NVARCHAR(255) NULL,        
+  [PasswordResetTokenExpires] DATETIME NULL,
+  FirstName NVARCHAR(100),
+  LastName NVARCHAR(100),
+  PhoneNum NVARCHAR(20),
+  Role NVARCHAR(50) NOT NULL, -- Customer, Technician, Admin
+  CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+);
+
+
+CREATE TABLE Devices (
+ DeviceId INT IDENTITY PRIMARY KEY,
+ UserId INT NOT NULL FOREIGN KEY REFERENCES Users(UserId),
+ DeviceType NVARCHAR(100),
+ Brand NVARCHAR(100),
+ Model NVARCHAR(100),
+ SerialNumber NVARCHAR(100),
+ );
+
+
+ CREATE TABLE RepairRequests (
+ RepairRequestId INT IDENTITY PRIMARY KEY,
+ ReferenceNumber NVARCHAR(50) NOT NULL UNIQUE,
+ UserId INT NOT NULL FOREIGN KEY REFERENCES Users(UserId),
+ DeviceId INT FOREIGN KEY REFERENCES Devices(DeviceId),
+ IssueDescription NVARCHAR(1000),
+ Status NVARCHAR(50) DEFAULT 'Received',
+ AssignedToUserId INT NULL FOREIGN KEY REFERENCES Users(UserId),
+ EstimatedCost DECIMAL(18,2) NULL,
+ CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+ UpdatedAt DATETIME2
+ );
+
+ CREATE TABLE StatusHistory (
+ StatusHistoryId INT IDENTITY PRIMARY KEY,
+ RepairRequestId INT NOT NULL FOREIGN KEY REFERENCES
+ RepairRequests(RepairRequestId),
+ Status NVARCHAR(50),
+ Note NVARCHAR(500),
+ ChangedBy INT,-- user id
+ ChangedAt DATETIME2 DEFAULT SYSUTCDATETIME()
+ );
+ 
+
+CREATE TABLE Parts (
+ PartId INT IDENTITY PRIMARY KEY,
+ Name NVARCHAR(200),
+ PartNumber NVARCHAR(100),
+ Price DECIMAL(18,2)
+ );
+
+
+ CREATE TABLE RepairParts (
+ RepairPartId INT IDENTITY PRIMARY KEY,
+ RepairRequestId INT FOREIGN KEY REFERENCES RepairRequests(RepairRequestId),
+ PartId INT FOREIGN KEY REFERENCES Parts(PartId),
+ Quantity INT,
+ Cost DECIMAL(18,2)
+ );
+
+
+ CREATE TABLE Payments (
+ PaymentId INT IDENTITY PRIMARY KEY,
+ RepairRequestId INT FOREIGN KEY REFERENCES RepairRequests(RepairRequestId),
+ Amount DECIMAL(18,2),
+ Method NVARCHAR(50),
+ TransactionId NVARCHAR(200),
+ PaidAt DATETIME2
+ );
