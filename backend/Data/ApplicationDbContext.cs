@@ -8,7 +8,13 @@ namespace backend.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :
         base(options)
         { }
-        public DbSet<Models.User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<RepairRequest> RepairRequests { get; set; }
+        public DbSet<Part> Parts { get; set; }
+        public DbSet<RepairPart> RepairParts { get; set; }
+        public DbSet<StatusHistory> StatusHistories { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +24,12 @@ namespace backend.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<RepairRequest>()
+            .HasIndex(r => r.ReferenceNumber)
+            .IsUnique();
+
         }
+
     }
 }

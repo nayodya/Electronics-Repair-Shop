@@ -1,16 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-public class RegisterUserDto
+
+namespace backend.Dto
 {
-    [Required]
-    [EmailAddress]
-    public required string Email { get; set; }
+    public class RegisterUserDto
+    {
+        [Required]
+        [EmailAddress]
+        public required string Email { get; set; }
 
-    [Required]
-    [MinLength(8)]
-    public required string Password { get; set; }
+        [Required]
+        [MinLength(8)]
+        public required string Password { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public required string FullName { get; set; }
+        [Required]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public required string ConfirmPassword { get; set; }
+    }
 }

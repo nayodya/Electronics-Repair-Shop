@@ -3,16 +3,136 @@
   "WorkspaceRootPath": "E:\\Electronics Repair Shop\\backend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\techniciancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\techniciancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\technicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\technicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\itechnicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\itechnicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\repairscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\repairscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\repairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\repairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\irepairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\irepairsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\partscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\partscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\assigntechniciandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\assigntechniciandto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\addparttorepairdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\addparttorepairdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\statushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\statushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\repairrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\repairrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\repairpart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\repairpart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\part.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\part.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\device.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\device.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\recordpaymentdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\recordpaymentdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\updatestatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\updatestatusdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\createrepairrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\createrepairrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\registoruserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\registoruserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\sendgridemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\sendgridemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\sendgridemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\sendgridemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\backend.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:backend.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\fotgotpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\fotgotpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\iemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -23,32 +143,8 @@
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\registoruserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\registoruserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:dto\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\backend.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:backend.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\backend.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
@@ -66,13 +162,13 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 10,
               "Title": "AuthController.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
               "ToolTip": "E:\\Electronics Repair Shop\\backend\\Controllers\\AuthController.cs",
               "RelativeToolTip": "Controllers\\AuthController.cs",
-              "ViewState": "AgIAAGoAAAAAAAAAAAAAAD0AAABMAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-13T12:28:21.715Z",
               "IsPinned": true,
@@ -93,136 +189,306 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAA8AAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-11T15:57:51.111Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Data\\ApplicationDbContext.cs",
-              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Data\\ApplicationDbContext.cs",
-              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAcwBMAAAAcAAAAAAAAAA==",
+              "Title": "TechnicianService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\TechnicianService.cs",
+              "RelativeDocumentMoniker": "Services\\TechnicianService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\TechnicianService.cs*",
+              "RelativeToolTip": "Services\\TechnicianService.cs*",
+              "ViewState": "AgIAADkAAAAAAAAAAAAswEsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-11T14:10:08.068Z",
+              "WhenOpened": "2025-09-01T11:25:45.525Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 8,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\AuthService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\AuthService.cs",
+              "RelativeToolTip": "Services\\AuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-01T11:04:44.413Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
               "Title": "User.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\User.cs",
               "RelativeDocumentMoniker": "Models\\User.cs",
               "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\User.cs",
               "RelativeToolTip": "Models\\User.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAYwCEAAABBAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-11T12:48:17.893Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Properties\\launchSettings.json",
-              "RelativeToolTip": "Properties\\launchSettings.json",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAACkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-11T10:26:48.561Z",
+              "DocumentIndex": 6,
+              "Title": "PartsController.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\PartsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PartsController.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Controllers\\PartsController.cs",
+              "RelativeToolTip": "Controllers\\PartsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:12:55.103Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "RegistorUserDto.cs",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\RegistorUserDto.cs",
-              "RelativeDocumentMoniker": "Dto\\RegistorUserDto.cs",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\RegistorUserDto.cs",
-              "RelativeToolTip": "Dto\\RegistorUserDto.cs",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAzwA8AAAABAAAAAAAAAA==",
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "Controllers\\AdminController.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAQwBwAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-13T13:01:48.713Z",
+              "WhenOpened": "2025-08-21T18:06:56.241Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAAADoAAAA1AAAAAAAAAA==",
+              "Title": "TechnicianController.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\TechnicianController.cs",
+              "RelativeDocumentMoniker": "Controllers\\TechnicianController.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Controllers\\TechnicianController.cs*",
+              "RelativeToolTip": "Controllers\\TechnicianController.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-11T10:30:47.434Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IEmailService.cs",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\IEmailService.cs",
-              "RelativeDocumentMoniker": "Services\\IEmailService.cs",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\IEmailService.cs",
-              "RelativeToolTip": "Services\\IEmailService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-13T12:10:04.389Z",
+              "WhenOpened": "2025-08-21T17:51:30.271Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "SendGridEmailService.cs",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\SendGridEmailService.cs",
-              "RelativeDocumentMoniker": "Services\\SendGridEmailService.cs",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\SendGridEmailService.cs",
-              "RelativeToolTip": "Services\\SendGridEmailService.cs",
+              "Title": "ITechnicianService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\ITechnicianService.cs",
+              "RelativeDocumentMoniker": "Services\\ITechnicianService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\ITechnicianService.cs*",
+              "RelativeToolTip": "Services\\ITechnicianService.cs*",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-13T12:43:50.54Z",
+              "WhenOpened": "2025-09-01T11:26:20.58Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RepairsService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\RepairsService.cs",
+              "RelativeDocumentMoniker": "Services\\RepairsService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\RepairsService.cs",
+              "RelativeToolTip": "Services\\RepairsService.cs",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAswG0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-01T11:21:46.555Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RepairsController.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\RepairsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\RepairsController.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Controllers\\RepairsController.cs",
+              "RelativeToolTip": "Controllers\\RepairsController.cs",
+              "ViewState": "AgIAAEcAAAAAAAAAAAAowFgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T05:00:41.487Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IRepairsService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\IRepairsService.cs",
+              "RelativeDocumentMoniker": "Services\\IRepairsService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\IRepairsService.cs",
+              "RelativeToolTip": "Services\\IRepairsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-01T11:22:08.72Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "RepairRequest.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\RepairRequest.cs",
+              "RelativeDocumentMoniker": "Models\\RepairRequest.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\RepairRequest.cs",
+              "RelativeToolTip": "Models\\RepairRequest.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAADwvysAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T04:57:11.005Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "RepairPart.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\RepairPart.cs",
+              "RelativeDocumentMoniker": "Models\\RepairPart.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\RepairPart.cs",
+              "RelativeToolTip": "Models\\RepairPart.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAAABsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:07:43.497Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Device.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\Device.cs",
+              "RelativeDocumentMoniker": "Models\\Device.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\Device.cs",
+              "RelativeToolTip": "Models\\Device.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAxwBwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T04:56:22.392Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 9,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\IAuthService.cs",
+              "RelativeDocumentMoniker": "Services\\IAuthService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\IAuthService.cs",
+              "RelativeToolTip": "Services\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-01T11:17:23.572Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "AssignTechnicianDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\AssignTechnicianDto.cs",
+              "RelativeDocumentMoniker": "Dto\\AssignTechnicianDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\AssignTechnicianDto.cs",
+              "RelativeToolTip": "Dto\\AssignTechnicianDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T18:05:23.739Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "UserDto.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\UserDto.cs",
               "RelativeDocumentMoniker": "Dto\\UserDto.cs",
               "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\UserDto.cs",
               "RelativeToolTip": "Dto\\UserDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-11T16:08:32.571Z",
+              "WhenOpened": "2025-08-21T18:06:30.006Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "backend",
-              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
-              "RelativeDocumentMoniker": "backend.csproj",
-              "ToolTip": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
-              "RelativeToolTip": "backend.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-12T06:23:59.205Z",
-              "EditorCaption": ""
+              "DocumentIndex": 15,
+              "Title": "StatusHistory.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\StatusHistory.cs",
+              "RelativeDocumentMoniker": "Models\\StatusHistory.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\StatusHistory.cs",
+              "RelativeToolTip": "Models\\StatusHistory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:06:31.666Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
+              "Title": "AddPartToRepairDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\AddPartToRepairDto.cs",
+              "RelativeDocumentMoniker": "Dto\\AddPartToRepairDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\AddPartToRepairDto.cs",
+              "RelativeToolTip": "Dto\\AddPartToRepairDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:11:20.033Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Part.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\Part.cs",
+              "RelativeDocumentMoniker": "Models\\Part.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\Part.cs",
+              "RelativeToolTip": "Models\\Part.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwBQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:08:07.223Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Payment.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\Payment.cs",
+              "RelativeDocumentMoniker": "Models\\Payment.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Models\\Payment.cs",
+              "RelativeToolTip": "Models\\Payment.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAAABsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:08:26.621Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "UpdateStatusDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\UpdateStatusDto.cs",
+              "RelativeDocumentMoniker": "Dto\\UpdateStatusDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\UpdateStatusDto.cs",
+              "RelativeToolTip": "Dto\\UpdateStatusDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:10:48.826Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "RecordPaymentDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\RecordPaymentDto.cs",
+              "RelativeDocumentMoniker": "Dto\\RecordPaymentDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\RecordPaymentDto.cs",
+              "RelativeToolTip": "Dto\\RecordPaymentDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T07:11:39.919Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAIwA8AAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T14:10:08.068Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "RegistorUserDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\RegistorUserDto.cs",
+              "RelativeDocumentMoniker": "Dto\\RegistorUserDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\RegistorUserDto.cs",
+              "RelativeToolTip": "Dto\\RegistorUserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-13T13:01:48.713Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
               "Title": "backend.http",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\backend.http",
               "RelativeDocumentMoniker": "backend.http",
@@ -230,20 +496,138 @@
               "RelativeToolTip": "backend.http",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2025-08-11T16:00:11.872Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-11T16:00:11.872Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 28,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-11T15:57:51.111Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T10:30:47.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "CreateRepairRequestDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\CreateRepairRequestDto.cs",
+              "RelativeDocumentMoniker": "Dto\\CreateRepairRequestDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\CreateRepairRequestDto.cs",
+              "RelativeToolTip": "Dto\\CreateRepairRequestDto.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAiwBYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-21T04:59:36.615Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Properties\\launchSettings.json",
+              "RelativeToolTip": "Properties\\launchSettings.json",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAACkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-11T10:26:48.561Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "SendGridEmailService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\SendGridEmailService.cs",
+              "RelativeDocumentMoniker": "Services\\SendGridEmailService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\SendGridEmailService.cs",
+              "RelativeToolTip": "Services\\SendGridEmailService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-13T12:43:50.54Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "LoginDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\LoginDto.cs",
+              "RelativeDocumentMoniker": "Dto\\LoginDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\LoginDto.cs",
+              "RelativeToolTip": "Dto\\LoginDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T06:43:52.165Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "FotgotPasswordDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\FotgotPasswordDto.cs",
+              "RelativeDocumentMoniker": "Dto\\FotgotPasswordDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\FotgotPasswordDto.cs",
+              "RelativeToolTip": "Dto\\FotgotPasswordDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T06:46:23.081Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "ResetPasswordDto.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\ResetPasswordDto.cs",
+              "RelativeDocumentMoniker": "Dto\\ResetPasswordDto.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Dto\\ResetPasswordDto.cs",
+              "RelativeToolTip": "Dto\\ResetPasswordDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T06:47:12.759Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "IEmailService.cs",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\IEmailService.cs",
+              "RelativeDocumentMoniker": "Services\\IEmailService.cs",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\IEmailService.cs",
+              "RelativeToolTip": "Services\\IEmailService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-13T12:10:04.389Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "backend.csproj",
+              "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
+              "RelativeDocumentMoniker": "backend.csproj",
+              "ToolTip": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
+              "RelativeToolTip": "backend.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-08-12T06:23:59.205Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
               "Title": "backend",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
               "RelativeDocumentMoniker": "backend.csproj",
               "ToolTip": "E:\\Electronics Repair Shop\\backend\\backend.csproj",
               "RelativeToolTip": "backend.csproj",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-11T10:26:49.784Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-11T10:26:49.784Z"
             }
           ]
         }

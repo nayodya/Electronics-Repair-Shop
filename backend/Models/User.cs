@@ -32,5 +32,7 @@ namespace backend.Models
         public DateTime? EmailVerifiedAt { get; set; }
         public string? VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiresAt { get; set; }
+        public string? PasswordResetToken { get; set; }
+        public DateTime? ResetTokenExpiresAt { get; set; }
     }
 }
