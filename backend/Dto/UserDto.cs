@@ -1,8 +1,9 @@
-﻿namespace backend.Dto
+﻿namespace backend.Dtos;
+
+public class UserDto
 {
-    public class UserDto
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
+    public int UserId { get; set; }
+    public required string Email { get; set; }
+    public string? FullName { get; set; }
+    public required string Role { get; set; }
 }

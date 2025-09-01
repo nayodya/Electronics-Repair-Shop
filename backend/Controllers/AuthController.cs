@@ -1,106 +1,83 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using backend.Data;
-using backend.Models;
+using backend.Dto;
 using backend.Services;
 
-namespace ErsApi.Controllers;
+namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IEmailService _emailService;
-    private readonly ILogger<AuthController> _logger;
+    private readonly IAuthService _authService;
 
-    public AuthController(ApplicationDbContext context, IEmailService emailService, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService)
     {
-        _context = context;
-        _emailService = emailService;
-        _logger = logger;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(ModelState);
+            await _authService.RegisterAsync(registerDto);
+            return StatusCode(201, new { message = "Registration successful. Please check your email to verify your account." });
         }
-
-        var userExists = await _context.Users.AnyAsync(u => u.Email == registerDto.Email);
-        if (userExists)
+        catch (Exception ex)
         {
-            return Conflict(new { message = "An account with this email already exists." });
+            return BadRequest(new { message = ex.Message });
         }
-
-        var verificationToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
-
-        var user = new User
-        {
-            Email = registerDto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            FullName = registerDto.FullName,
-            Role = "Customer",
-            VerificationToken = verificationToken,
-            VerificationTokenExpiresAt = DateTime.UtcNow.AddHours(24)
-        };
-
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-
-        var verificationLink = Url.Action(nameof(VerifyEmail), "Auth", new { token = verificationToken }, Request.Scheme);
-
-        if (verificationLink != null)
-        {
-            var emailBody = $"<h1>Welcome to ERS!</h1>" +
-                            $"<p>Please verify your email by <a href='{verificationLink}'>clicking here</a>.</p>" +
-                            $"<p>This link is valid for 24 hours.</p>";
-
-            await _emailService.SendEmailAsync(user.Email, "Verify Your ERS Account", emailBody);
-        }
-        else
-        {
-            _logger.LogError("Could not generate email verification link.");
-        }
-
-        return StatusCode(201, new { message = "Registration successful. Please check your email to verify your account." });
     }
 
     [HttpGet("verify-email")]
     public async Task<IActionResult> VerifyEmail([FromQuery] string token)
     {
-        if (string.IsNullOrEmpty(token))
+        try
         {
-            return BadRequest(new { message = "Verification token is required." });
+            await _authService.VerifyEmailAsync(token);
+            return Ok(new { message = "Email verified successfully. You can now log in." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
 
-        if (user == null)
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    {
+        try
         {
-            return NotFound(new { message = "Invalid verification token." });
+            var token = await _authService.LoginAsync(loginDto);
+            return Ok(new { token });
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+    {
+        await _authService.ForgotPasswordAsync(forgotPasswordDto);
+        return Ok(new { message = "If an account with that email exists, a password reset link has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        try
+        {
+            await _authService.ResetPasswordAsync(resetPasswordDto);
+            return Ok(new { message = "Password has been reset successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
 
-        if (user.EmailVerifiedAt.HasValue)
-        {
-            return BadRequest(new { message = "Email is already verified." });
-        }
-
-        if (user.VerificationTokenExpiresAt < DateTime.UtcNow)
-        {
-            return BadRequest(new { message = "Verification token has expired." });
-        }
-
-        user.EmailVerifiedAt = DateTime.UtcNow;
-        user.VerificationToken = null;
-        user.VerificationTokenExpiresAt = null;
-
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Email verified successfully. You can now log in." });
     }
 }
