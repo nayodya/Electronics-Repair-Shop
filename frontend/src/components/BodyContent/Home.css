@@ -1,0 +1,18 @@
+.Mainbody{
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    min-height: 80vh;
+}
+
+.Mainbody h1{
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.Mainbody p{
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}

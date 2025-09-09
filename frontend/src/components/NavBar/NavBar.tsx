@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import "./NavBar.css";
+import { Link } from "react-router-dom";
 
 function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,10 +20,10 @@ function NavBar() {
 
             {/* Desktop Navigation Links */}
             <div className="nav-center">
-                <a href="#services" className="nav-link">Services</a>
-                <a href="#repair" className="nav-link">Repair</a>
-                <a href="#pricing" className="nav-link">Pricing</a>
-                <a href="#about" className="nav-link">About us</a>
+                <Link to="/" className="nav-link">Home</Link>
+                <Link to="/services" className="nav-link">Services</Link>
+                <Link to="/about" className="nav-link">About us</Link>
+                <Link to="/contact" className="nav-link">Contact Us</Link>
             </div>
 
             {/* Right Side Actions */}
@@ -44,10 +45,10 @@ function NavBar() {
 
             {/* Mobile Menu */}
             <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-                <a href="#services" className="mobile-nav-link">Services</a>
-                <a href="#repair" className="mobile-nav-link">Repair</a>
-                <a href="#pricing" className="mobile-nav-link">Pricing</a>
-                <a href="#about" className="mobile-nav-link">About us</a>
+                <Link to="/" className="mobile-nav-link">Home</Link>
+                <Link to="/services" className="mobile-nav-link">Services</Link>
+                <Link to="/about" className="mobile-nav-link">About us</Link>
+                <Link to="/contact" className="mobile-nav-link">Contact Us</Link>
                 <div className="mobile-actions">
                     <a href="#login" className="mobile-login-btn">Sign In</a>
                     <a href="#register" className="mobile-register-btn">Join Now</a>
