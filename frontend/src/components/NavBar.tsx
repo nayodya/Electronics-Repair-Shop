@@ -1,0 +1,60 @@
+
+import { useState } from "react";
+import "./NavBar.css";
+
+function NavBar() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    return (
+        <div className="navbar">
+            {/* Logo Section */}
+            <div className="logo-section">
+                <img src="" alt="Logo" />
+                <a href="#home" className="brand-name">TechFix Pro</a>
+            </div>
+
+            {/* Desktop Navigation Links */}
+            <div className="nav-center">
+                <a href="#services" className="nav-link">Services</a>
+                <a href="#repair" className="nav-link">Repair</a>
+                <a href="#pricing" className="nav-link">Pricing</a>
+                <a href="#about" className="nav-link">About us</a>
+            </div>
+
+            {/* Right Side Actions */}
+            <div className="nav-actions">
+                <a href="#login" className="login-btn">Sign In</a>
+                <a href="#register" className="register-btn">Join Now</a>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+                className="mobile-menu-toggle"
+                onClick={toggleMobileMenu}
+                aria-label="Toggle mobile menu"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+                <a href="#services" className="mobile-nav-link">Services</a>
+                <a href="#repair" className="mobile-nav-link">Repair</a>
+                <a href="#pricing" className="mobile-nav-link">Pricing</a>
+                <a href="#about" className="mobile-nav-link">About us</a>
+                <div className="mobile-actions">
+                    <a href="#login" className="mobile-login-btn">Sign In</a>
+                    <a href="#register" className="mobile-register-btn">Join Now</a>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default NavBar;
