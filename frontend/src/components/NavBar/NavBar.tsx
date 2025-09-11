@@ -28,8 +28,8 @@ function NavBar() {
 
             {/* Right Side Actions */}
             <div className="nav-actions">
-                <a href="#login" className="login-btn">Sign In</a>
-                <a href="#register" className="register-btn">Join Now</a>
+                <Link to="/login" className="login-btn">SignIn</Link>
+                <Link to="/register" className="register-btn">Join Now</Link>
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -50,8 +50,8 @@ function NavBar() {
                 <Link to="/about" className="mobile-nav-link">About us</Link>
                 <Link to="/contact" className="mobile-nav-link">Contact Us</Link>
                 <div className="mobile-actions">
-                    <a href="#login" className="mobile-login-btn">Sign In</a>
-                    <a href="#register" className="mobile-register-btn">Join Now</a>
+                    <Link to="/login" className="mobile-login-btn">SignIn</Link>
+                    <Link to="/register" className="mobile-register-btn">Join Now</Link>
                 </div>
             </div>
         </div>
