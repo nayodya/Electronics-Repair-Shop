@@ -1,5 +1,9 @@
 import React from "react";
-import "./Home.css"
+import "./Home.css";
+import { MdFeaturedPlayList } from "react-icons/md";
+import { BsLaptop } from "react-icons/bs";
+import { GiAutoRepair } from "react-icons/gi";
+import { MdEngineering } from "react-icons/md";
 
 const Home: React.FC = () => {
   return (
@@ -9,20 +13,20 @@ const Home: React.FC = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1>Professional Electronics Repair Services</h1>
-            <p>Expert solutions for all your electronic devices with 8+ years of experience</p>
-            <button className="cta-button">Get Free Quote</button>
+            <p >Expert solutions for all your electronic devices with 8+ years of experience</p>
+            <button className="cta-button">Repair</button>
           </div>
           <div className="hero-image">
             <div className="repair-illustration">
-              <div className="device-icon">📱</div>
-              <div className="repair-tools">🔧</div>
-              <div className="technician">👨‍🔧</div>
+              <div className="device-icon"><BsLaptop /></div>
+              <div className="repair-tools"><GiAutoRepair /></div>
+              <div className="technician"><MdEngineering /></div>
             </div>
           </div>
         </div>
       </section>
 
-      Photo collage section
+      {/* Photo collage section
       <section className="photo-collage">
         <div className="collage-grid">
           <img src="/images/image1.jpg" alt="Repair 1" className="collage-image" />
@@ -36,7 +40,7 @@ const Home: React.FC = () => {
           <img src="/images/image9.jpg" alt="Repair 9" className="collage-image" />
           <img src="/images/image10.jpg" alt="Repair " className="collage-image" />
         </div>
-      </section>
+      </section> */}
 
 
       {/* Client Logos Section */}
@@ -57,7 +61,7 @@ const Home: React.FC = () => {
           <h2>Manage your entire electronics repair in one system</h2>
           <div className="service-features">
             <div className="feature-item">
-              <div className="feature-icon">📋</div>
+              <div className="feature-icon"><MdFeaturedPlayList /></div>
               <div>
                 <h4>Diagnostic Services</h4>
                 <p>Complete device analysis</p>
