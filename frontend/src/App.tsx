@@ -1,19 +1,111 @@
-import NavBar from "./components/NavBar/NavBar"
-import Footer from "./components/Footer/Footer"
-import MainCOntent from "./components/BodyContent/MainContent"
-import { AuthProvider } from "./context/AuthContext"
+import { AuthProvider } from "./context/AuthContext";
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Public pages
+import Home from "./components/BodyContent/DefaultDashboard/Home";
+import About from "./components/BodyContent/DefaultDashboard/About";
+import Services from "./components/BodyContent/DefaultDashboard/Services";
+import Contact from "./components/BodyContent/DefaultDashboard/Contact";
+import Register from "./components/BodyContent/Register & Login/Register";
+import LogIn from "./components/BodyContent/Register & Login/LogIn";
+import ForgotPassword from "./components/BodyContent/Register & Login/ForgotPassword";
+import ResetPassword from "./components/BodyContent/Register & Login/ResetPassword";
+
+// Dashboard pages
+import CustomerDashboard from "./components/BodyContent/Dashboards/Customer/CustomerDashboard";
+import AddRepairOrderPage from "./components/BodyContent/Dashboards/Customer/AddRepair";
+import RepairHistory from "./components/BodyContent/Dashboards/Customer/RepairHistory";
+
+import TechnicianDashboard from "./components/BodyContent/Dashboards/TechnicianDashboard";
+import AdminDashboard from "./components/BodyContent/Dashboards/AdminDashboard";
+import PublicLayout from "./components/layouts/PublicLayout";
+import DashboardLayout from "./components/layouts/DashboardLayout";
 
 function App() {
-
   return (
-    <>
-      <NavBar />
-      <AuthProvider>
-        <MainCOntent />
-      </AuthProvider>
-      <Footer />
-    </>
-  )
+    <AuthProvider>
+      <Routes>
+        {/* Public Routes with Public Layout */}
+        <Route path="/" element={<PublicLayout />}>
+          <Route index element={<Home />} />
+          <Route path="services" element={<Services />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="register" element={<Register />} />
+          <Route path="login" element={<LogIn />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+        </Route>
+
+        {/* Protected Customer Routes with Dashboard Layout */}
+        <Route path="/customer" element={
+          <ProtectedRoute allowedRoles={["Customer"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<CustomerDashboard />} />
+          <Route path="add-repair" element={<AddRepairOrderPage />} />
+          <Route path="repair-orders" element={<RepairHistory />} />
+          <Route path="orders" element={<RepairHistory />} />
+          <Route path="new-order" element={<AddRepairOrderPage />} />
+        </Route>
+
+        {/* Protected Technician Routes with Dashboard Layout */}
+        <Route path="/technician" element={
+          <ProtectedRoute allowedRoles={["Technician"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<TechnicianDashboard />} />
+          <Route path="jobs" element={<div>Technician Jobs</div>} />
+          <Route path="schedule" element={<div>Technician Schedule</div>} />
+          <Route path="profile" element={<div>Technician Profile</div>} />
+        </Route>
+
+        {/* Protected Admin Routes with Dashboard Layout */}
+        <Route path="/admin" element={
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<div>Admin Users</div>} />
+          <Route path="reports" element={<div>Admin Reports</div>} />
+          <Route path="settings" element={<div>Admin Settings</div>} />
+        </Route>
+
+        {/* Catch-all route for 404 */}
+        <Route path="*" element={
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            textAlign: 'center',
+            padding: '2rem'
+          }}>
+            <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>404</h1>
+            <h2 style={{ marginBottom: '1rem' }}>Page Not Found</h2>
+            <p style={{ marginBottom: '2rem', color: '#666' }}>
+              The page you're looking for doesn't exist.
+            </p>
+            <a href="/" style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: '600'
+            }}>
+              Go Home
+            </a>
+          </div>
+        } />
+      </Routes>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
