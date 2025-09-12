@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   const { user } = useContext(AuthContext);
 
   if (!user) return <Navigate to="/login" replace />;
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/unauthorized" replace />;
+  if (!allowedRoles.includes(user.role)) return <Navigate to="/login" replace />;
 
   return children;
 };

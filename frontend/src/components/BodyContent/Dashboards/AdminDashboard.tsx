@@ -1,4 +1,3 @@
-// src/pages/CustomerDashboard.tsx
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
