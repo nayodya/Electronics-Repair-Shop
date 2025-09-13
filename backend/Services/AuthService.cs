@@ -43,7 +43,7 @@ public class AuthService : IAuthService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        var verificationLink = $"http://localhost:5173/verify-email?token={verificationToken}";
+        var verificationLink = $"{_configuration["ClientAppUrl"]}/verify-email?token={verificationToken}";
         var emailBody = $"<h1>Welcome to ERS!</h1><p>Please verify your email by <a href='{verificationLink}'>clicking here</a>. This link is valid for 24 hours.</p>";
 
         await _emailService.SendEmailAsync(user.Email, "Verify Your ERS Account", emailBody);
@@ -90,7 +90,7 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
 
-        var resetLink = $"http://localhost:5173/reset-password?token={resetToken}";
+        var resetLink = $"{_configuration["ClientAppUrl"]}/reset-password?token={resetToken}";
         var emailBody = $"<h1>Password Reset Request</h1><p>Click <a href='{resetLink}'>here</a> to reset your password.</p>";
 
         await _emailService.SendEmailAsync(user.Email, "ERS Password Reset", emailBody);
@@ -107,6 +107,22 @@ public class AuthService : IAuthService
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         user.PasswordResetToken = null;
         user.ResetTokenExpiresAt = null;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task CreateProfileAsync(CreateAccountDto dto)
+    {
+        var user = await _context.Users.FindAsync(dto.UserId);
+        if (user == null)
+        {
+            throw new Exception("User not found.");
+        }
+
+        user.FirstName = dto.FirstName;
+        user.LastName = dto.LastName;
+        user.Address = dto.Address;
+        user.ContactNumber = dto.ContactNumber;
 
         await _context.SaveChangesAsync();
     }

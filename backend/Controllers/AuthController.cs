@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using backend.Dto;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace backend.Controllers;
 
@@ -41,8 +43,6 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-
-
     }
 
     [HttpPost("login")]
@@ -78,6 +78,22 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
 
+    [Authorize]
+    [HttpPost("create-profile")]
+    public async Task<IActionResult> CreateProfile([FromBody] CreateAccountDto dto)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            dto.UserId = userId;
+            await _authService.CreateProfileAsync(dto);
+            return Ok(new { message = "Profile created successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

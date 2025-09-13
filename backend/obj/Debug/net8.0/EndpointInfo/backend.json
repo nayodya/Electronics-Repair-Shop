@@ -5,72 +5,6 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Admin/users": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Admin/technicians": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Admin/repairs/{id}/assign": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignTechnicianDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignTechnicianDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignTechnicianDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Auth/register": {
       "post": {
         "tags": [
@@ -216,40 +150,73 @@
         }
       }
     },
-    "/api/Parts": {
+    "/api/Auth/create-profile": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/submit": {
+      "post": {
+        "tags": [
+          "Repair"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRepairRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRepairRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRepairRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/my-requests": {
       "get": {
         "tags": [
-          "Parts"
+          "Repair"
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Parts"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Part"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Part"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Part"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -257,167 +224,10 @@
         }
       }
     },
-    "/api/Repairs": {
-      "post": {
-        "tags": [
-          "Repairs"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRepairRequestDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRepairRequestDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRepairRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Repairs/{id}/status": {
-      "post": {
-        "tags": [
-          "Repairs"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStatusDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStatusDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStatusDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Repairs/{id}/parts": {
-      "post": {
-        "tags": [
-          "Repairs"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Repairs/{id}/payments": {
-      "post": {
-        "tags": [
-          "Repairs"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordPaymentDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordPaymentDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordPaymentDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Technician/my-repairs": {
+    "/api/Repair/all": {
       "get": {
         "tags": [
-          "Technician"
+          "Repair"
         ],
         "responses": {
           "200": {
@@ -426,19 +236,18 @@
         }
       }
     },
-    "/api/Technician/repairs/{id}/accept": {
-      "post": {
+    "/api/Repair/{referenceNumber}": {
+      "get": {
         "tags": [
-          "Technician"
+          "Repair"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "referenceNumber",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -449,14 +258,14 @@
         }
       }
     },
-    "/api/Technician/repairs/{id}/parts": {
-      "post": {
+    "/api/Repair/{requestId}/status": {
+      "put": {
         "tags": [
-          "Technician"
+          "Repair"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "requestId",
             "in": "path",
             "required": true,
             "schema": {
@@ -469,21 +278,159 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
+                "$ref": "#/components/schemas/UpdateRepairStatusDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
+                "$ref": "#/components/schemas/UpdateRepairStatusDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddPartToRepairDto"
+                "$ref": "#/components/schemas/UpdateRepairStatusDto"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/{requestId}/assign": {
+      "put": {
+        "tags": [
+          "Repair"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTechnicianDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTechnicianDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTechnicianDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/{requestId}/estimated-days": {
+      "put": {
+        "tags": [
+          "Repair"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEstimatedDaysDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEstimatedDaysDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEstimatedDaysDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/{requestId}/payment": {
+      "post": {
+        "tags": [
+          "Repair"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPaymentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPaymentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Repair/technicians": {
+      "get": {
+        "tags": [
+          "Repair"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -494,66 +441,100 @@
   },
   "components": {
     "schemas": {
-      "AddPartToRepairDto": {
+      "AddPaymentDto": {
         "required": [
-          "partId",
-          "quantity"
+          "totalAmount"
         ],
         "type": "object",
         "properties": {
-          "partId": {
-            "type": "integer",
-            "format": "int32"
+          "totalAmount": {
+            "minimum": 0.01,
+            "type": "number",
+            "format": "double"
           },
-          "quantity": {
-            "maximum": 2147483647,
-            "minimum": 1,
-            "type": "integer",
-            "format": "int32"
+          "advancedPayment": {
+            "minimum": 0,
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "AssignTechnicianDto": {
         "required": [
-          "technicianUserId"
+          "technicianId"
         ],
         "type": "object",
         "properties": {
-          "technicianUserId": {
+          "technicianId": {
             "type": "integer",
             "format": "int32"
           }
         },
         "additionalProperties": false
       },
+      "CreateAccountDto": {
+        "required": [
+          "address",
+          "contactNumber",
+          "firstName",
+          "lastName"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lastName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "contactNumber": {
+            "minLength": 1,
+            "pattern": "^\\+?\\d{10,15}$",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateRepairRequestDto": {
         "required": [
-          "issueDescription",
-          "make",
+          "brand",
+          "device",
+          "issue",
           "model"
         ],
         "type": "object",
         "properties": {
-          "make": {
-            "maxLength": 100,
+          "device": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "brand": {
             "minLength": 1,
             "type": "string"
           },
           "model": {
-            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
-          "serialNumber": {
-            "maxLength": 100,
+          "issue": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
             "type": "string",
             "nullable": true
-          },
-          "issueDescription": {
-            "maxLength": 1000,
-            "minLength": 1,
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -591,57 +572,6 @@
         },
         "additionalProperties": false
       },
-      "Part": {
-        "required": [
-          "name",
-          "price"
-        ],
-        "type": "object",
-        "properties": {
-          "partId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "maxLength": 200,
-            "minLength": 1,
-            "type": "string"
-          },
-          "partNumber": {
-            "maxLength": 100,
-            "type": "string",
-            "nullable": true
-          },
-          "price": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RecordPaymentDto": {
-        "required": [
-          "amount",
-          "method"
-        ],
-        "type": "object",
-        "properties": {
-          "amount": {
-            "minimum": 0.01,
-            "type": "number",
-            "format": "double"
-          },
-          "method": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "transactionId": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "RegisterUserDto": {
         "required": [
           "confirmPassword",
@@ -666,6 +596,20 @@
         },
         "additionalProperties": false
       },
+      "RepairStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "ResetPasswordDto": {
         "required": [
           "newPassword",
@@ -684,21 +628,29 @@
         },
         "additionalProperties": false
       },
-      "UpdateStatusDto": {
+      "UpdateEstimatedDaysDto": {
         "required": [
-          "newStatus"
+          "estimatedCompletionDays"
         ],
         "type": "object",
         "properties": {
-          "newStatus": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
-          },
-          "note": {
-            "maxLength": 500,
-            "type": "string",
-            "nullable": true
+          "estimatedCompletionDays": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateRepairStatusDto": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/RepairStatus"
           }
         },
         "additionalProperties": false

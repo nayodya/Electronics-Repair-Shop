@@ -1,43 +1,18 @@
 [
   {
-    "ContainingType": "backend.Controllers.AdminController",
-    "Method": "AssignTechnician",
-    "RelativePath": "api/Admin/repairs/{id}/assign",
+    "ContainingType": "backend.Controllers.AuthController",
+    "Method": "CreateProfile",
+    "RelativePath": "api/Auth/create-profile",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "assignDto",
-        "Type": "backend.Dtos.AssignTechnicianDto",
+        "Name": "dto",
+        "Type": "backend.Dto.CreateAccountDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "backend.Controllers.AdminController",
-    "Method": "GetTechnicians",
-    "RelativePath": "api/Admin/technicians",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "backend.Controllers.AdminController",
-    "Method": "GetAllUsers",
-    "RelativePath": "api/Admin/users",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -121,114 +96,109 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.PartsController",
-    "Method": "GetAllParts",
-    "RelativePath": "api/Parts",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "GetRequestByReferenceNumber",
+    "RelativePath": "api/Repair/{referenceNumber}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "backend.Controllers.PartsController",
-    "Method": "CreatePart",
-    "RelativePath": "api/Parts",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
     "Parameters": [
       {
-        "Name": "part",
-        "Type": "backend.Models.Part",
+        "Name": "referenceNumber",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.RepairsController",
-    "Method": "CreateRepairRequest",
-    "RelativePath": "api/Repairs",
-    "HttpMethod": "POST",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "AssignTechnician",
+    "RelativePath": "api/Repair/{requestId}/assign",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "requestDto",
-        "Type": "backend.Dtos.CreateRepairRequestDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "backend.Controllers.RepairsController",
-    "Method": "AddPartToRepair",
-    "RelativePath": "api/Repairs/{id}/parts",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
+        "Name": "requestId",
         "Type": "System.Int32",
         "IsRequired": true
       },
       {
-        "Name": "partDto",
-        "Type": "backend.Dtos.AddPartToRepairDto",
+        "Name": "dto",
+        "Type": "backend.Dto.AssignTechnicianDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.RepairsController",
-    "Method": "RecordPayment",
-    "RelativePath": "api/Repairs/{id}/payments",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "UpdateEstimatedDays",
+    "RelativePath": "api/Repair/{requestId}/estimated-days",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "backend.Dto.UpdateEstimatedDaysDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "AddPayment",
+    "RelativePath": "api/Repair/{requestId}/payment",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "requestId",
         "Type": "System.Int32",
         "IsRequired": true
       },
       {
-        "Name": "paymentDto",
-        "Type": "backend.Dtos.RecordPaymentDto",
+        "Name": "dto",
+        "Type": "backend.Dto.AddPaymentDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.RepairsController",
+    "ContainingType": "backend.Controllers.RepairController",
     "Method": "UpdateStatus",
-    "RelativePath": "api/Repairs/{id}/status",
-    "HttpMethod": "POST",
+    "RelativePath": "api/Repair/{requestId}/status",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "requestId",
         "Type": "System.Int32",
         "IsRequired": true
       },
       {
-        "Name": "statusDto",
-        "Type": "backend.Dtos.UpdateStatusDto",
+        "Name": "dto",
+        "Type": "backend.Dto.UpdateRepairStatusDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.TechnicianController",
-    "Method": "GetMyAssignedRepairs",
-    "RelativePath": "api/Technician/my-repairs",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "GetAllRepairRequests",
+    "RelativePath": "api/Repair/all",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -236,40 +206,39 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.TechnicianController",
-    "Method": "AcceptRepairRequest",
-    "RelativePath": "api/Technician/repairs/{id}/accept",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "GetCustomerRequests",
+    "RelativePath": "api/Repair/my-requests",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "SubmitRepairRequest",
+    "RelativePath": "api/Repair/submit",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.Int32",
+        "Name": "dto",
+        "Type": "backend.Dto.CreateRepairRequestDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "backend.Controllers.TechnicianController",
-    "Method": "AddPartToRepair",
-    "RelativePath": "api/Technician/repairs/{id}/parts",
-    "HttpMethod": "POST",
+    "ContainingType": "backend.Controllers.RepairController",
+    "Method": "GetTechnicians",
+    "RelativePath": "api/Repair/technicians",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "partDto",
-        "Type": "backend.Dtos.AddPartToRepairDto",
-        "IsRequired": true
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   }
 ]

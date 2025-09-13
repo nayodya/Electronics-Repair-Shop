@@ -1,23 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using backend.Models;
 
-namespace backend.Dtos;
+namespace backend.Dto;
 
 public class CreateRepairRequestDto
 {
-    // Device Information
     [Required]
-    [MaxLength(100)]
-    public required string Make { get; set; }
+    public string Device { get; set; }
 
     [Required]
-    [MaxLength(100)]
-    public required string Model { get; set; }
+    public string Brand { get; set; }
 
-    [MaxLength(100)]
-    public string? SerialNumber { get; set; }
-
-    // Repair Information
     [Required]
-    [MaxLength(1000)]
-    public required string IssueDescription { get; set; }
+    public string Model { get; set; }
+
+    [Required]
+    public string Issue { get; set; }
+
+    public string? Description { get; set; }
 }

@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace backend.Dtos;
-
-public class AssignTechnicianDto
+namespace backend.Dto
 {
-    [Required]
-    public int TechnicianUserId { get; set; }
+    public class AssignTechnicianDto
+    {
+        [Required]
+        public int TechnicianId { get; set; }
+    }
 }
