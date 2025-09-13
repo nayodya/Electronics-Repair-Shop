@@ -3,41 +3,59 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models;
 
+// Enum for the different states of a repair request
+public enum RepairStatus
+{
+    Submitted,
+    Received,
+    Assigned,
+    InProgress,
+    Finished,
+    ToDeliver,
+    Delivered,
+    Cancelled
+}
+
+// Model for the Repair Request
 public class RepairRequest
 {
-    public int RepairRequestId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int RequestId { get; set; }
 
     [Required]
-    [MaxLength(50)]
-    public required string ReferenceNumber { get; set; }
+    public string ReferenceNumber { get; set; } = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
 
     [Required]
-    public int UserId { get; set; } // Customer who owns the device
-
-    [ForeignKey("UserId")]
-    public User? User { get; set; }
-
-    public int? DeviceId { get; set; } // The device being repaired
-
-    [ForeignKey("DeviceId")]
-    public Device? Device { get; set; }
+    public int CustomerId { get; set; }
+    [ForeignKey("CustomerId")]
+    public User? Customer { get; set; }
 
     [Required]
-    [MaxLength(1000)]
-    public required string IssueDescription { get; set; }
+    public string Device { get; set; }
 
     [Required]
-    [MaxLength(50)]
-    public string Status { get; set; } = "Received"; // Default status
+    public string Brand { get; set; }
 
-    public int? AssignedToUserId { get; set; } // Technician assigned to the repair
+    [Required]
+    public string Model { get; set; }
 
-    [ForeignKey("AssignedToUserId")]
-    public User? AssignedTo { get; set; }
+    [Required]
+    public string Issue { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal? EstimatedCost { get; set; }
+    public string? Description { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
+    [Required]
+    public RepairStatus Status { get; set; } = RepairStatus.Submitted;
+
+    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+
+    public int? EstimatedCompletionDays { get; set; }
+
+    public int? TechnicianId { get; set; }
+    [ForeignKey("TechnicianId")]
+    public User? Technician { get; set; }
+
+    public Payment? PaymentDetails { get; set; }
+
 }

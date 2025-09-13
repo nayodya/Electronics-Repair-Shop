@@ -134,7 +134,6 @@ E:\Electronics Repair Shop\backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Wo
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
-E:\Electronics Repair Shop\backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\Azure.Core.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\Azure.Identity.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
@@ -177,3 +176,4 @@ E:\Electronics Repair Shop\backend\bin\Debug\net8.0\BCrypt.Net-Next.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\Newtonsoft.Json.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\SendGrid.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\StarkbankEcdsa.dll
+E:\Electronics Repair Shop\backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -1,38 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// File: User.cs
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace backend.Models
+namespace backend.Models;
+
+public class User
 {
-    public class User
-    {
-        public int UserId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int UserId { get; set; }
 
-        [Required]
-        [EmailAddress]
-        [MaxLength(256)]
-        public required string Email { get; set; }
+    [Required]
+    [EmailAddress]
 
-        [Required]
-        [MaxLength(512)]
-        public required string PasswordHash { get; set; }
+    public required string Email { get; set; }
 
-        [MaxLength(100)]
-        public string? FullName { get; set; }
+    [Required]
 
-        [Phone]
-        [MaxLength(20)]
-        public string? Phone { get; set; }
+    public required string PasswordHash { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        public required string Role { get; set; } // "Customer", "Technician", "Admin"
+    [Required]
+    public required string Role { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    // Verification properties
+    public string? VerificationToken { get; set; }
+    public DateTime? VerificationTokenExpiresAt { get; set; }
+    public DateTime? EmailVerifiedAt { get; set; }
 
-        // Properties for Email Verification
-        public DateTime? EmailVerifiedAt { get; set; }
-        public string? VerificationToken { get; set; }
-        public DateTime? VerificationTokenExpiresAt { get; set; }
-        public string? PasswordResetToken { get; set; }
-        public DateTime? ResetTokenExpiresAt { get; set; }
-    }
+    // Password reset properties
+    public string? PasswordResetToken { get; set; }
+    public DateTime? ResetTokenExpiresAt { get; set; }
+
+    // Additional user information
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Address { get; set; }
+    public string? ContactNumber { get; set; }
 }

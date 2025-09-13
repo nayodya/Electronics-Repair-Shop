@@ -3,7 +3,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models; 
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +21,7 @@ builder.Services.AddDbContext<backend.Data.ApplicationDbContext>(options =>
 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridSettings"));
 builder.Services.AddTransient<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
-builder.Services.AddScoped<IPartService, PartService>();
-builder.Services.AddScoped<IRepairsService, RepairsService>();
+builder.Services.AddScoped<IRepairService, RepairService>();
 
 builder.Services.AddAuthentication(options =>
 {
