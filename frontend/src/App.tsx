@@ -18,9 +18,12 @@ import AddRepairOrderPage from "./components/BodyContent/Dashboards/Customer/Add
 import RepairHistory from "./components/BodyContent/Dashboards/Customer/RepairHistory";
 
 import TechnicianDashboard from "./components/BodyContent/Dashboards/TechnicianDashboard";
-import AdminDashboard from "./components/BodyContent/Dashboards/AdminDashboard";
+import AdminDashboard from "./components/BodyContent/Dashboards/Admin/AdminDashboard";
 import PublicLayout from "./components/layouts/PublicLayout";
 import DashboardLayout from "./components/layouts/DashboardLayout";
+import ManageRequests from "./components/BodyContent/Dashboards/Admin/ManageRequests";
+import ManageTechnicians from "./components/BodyContent/Dashboards/Admin/ManageTechnicians";
+import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
 
 function App() {
   return (
@@ -70,9 +73,9 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="users" element={<div>Admin Users</div>} />
-          <Route path="reports" element={<div>Admin Reports</div>} />
-          <Route path="settings" element={<div>Admin Settings</div>} />
+          <Route path="dashboard/requests" element={<div>{<ManageRequests/>}</div>} />
+          <Route path="dashboard/users" element={<div>{<ManageTechnicians/>}</div>} />
+          <Route path="dashboard/technicians" element={<div>{<ManageUsers/>}</div>} />
         </Route>
 
         {/* Catch-all route for 404 */}
