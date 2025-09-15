@@ -42,7 +42,7 @@ const AddRepairOrderPage = () => {
 
     try {
       const res = await api.post(
-        "/repairs",
+        "/repairs/submit",
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

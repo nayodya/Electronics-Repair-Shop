@@ -16,6 +16,7 @@ import ResetPassword from "./components/BodyContent/Register & Login/ResetPasswo
 import CustomerDashboard from "./components/BodyContent/Dashboards/Customer/CustomerDashboard";
 import AddRepairOrderPage from "./components/BodyContent/Dashboards/Customer/AddRepair";
 import RepairHistory from "./components/BodyContent/Dashboards/Customer/RepairHistory";
+import RepairOrderDetails from "./components/BodyContent/Dashboards/Customer/RepairOrderDetails";
 
 import TechnicianDashboard from "./components/BodyContent/Dashboards/TechnicianDashboard";
 import AdminDashboard from "./components/BodyContent/Dashboards/Admin/AdminDashboard";
@@ -24,6 +25,7 @@ import DashboardLayout from "./components/layouts/DashboardLayout";
 import ManageRequests from "./components/BodyContent/Dashboards/Admin/ManageRequests";
 import ManageTechnicians from "./components/BodyContent/Dashboards/Admin/ManageTechnicians";
 import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
+import CustomerDetails from "./components/BodyContent/Dashboards/Customer/Proofile";
 
 function App() {
   return (
@@ -50,8 +52,8 @@ function App() {
           <Route path="dashboard" element={<CustomerDashboard />} />
           <Route path="add-repair" element={<AddRepairOrderPage />} />
           <Route path="repair-orders" element={<RepairHistory />} />
-          <Route path="orders" element={<RepairHistory />} />
-          <Route path="new-order" element={<AddRepairOrderPage />} />
+          <Route path="edit-profile" element={<CustomerDetails />} />
+          <Route path="repair-order-details" element={<RepairOrderDetails />} />
         </Route>
 
         {/* Protected Technician Routes with Dashboard Layout */}

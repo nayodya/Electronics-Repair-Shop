@@ -76,13 +76,29 @@ const CustomerDashboard = () => {
     const fetchCustomerData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch repair orders
-        const ordersResponse = await api.get("/repairs/my-orders", {
+        const ordersResponse = await api.get("/Repair/my-requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        
-        const ordersData: RepairOrder[] = ordersResponse.data;
+
+        // Map backend data to frontend shape
+        const ordersData: RepairOrder[] = ordersResponse.data.map((item: any) => ({
+          repairRequestId: item.requestId,
+          referenceNumber: item.referenceNumber,
+          device: {
+            make: item.brand,
+            model: item.model,
+            serialNumber: "", // or item.serialNumber if available
+            deviceType: "",   // or item.deviceType if available
+          },
+          status: mapStatus(item.status), // convert status number to string
+          issueDescription: item.description || item.issue || "",
+          createdAt: item.submittedAt,
+          estimatedCost: item.estimatedCost,
+          completedAt: item.completedAt,
+        }));
+
         setOrders(ordersData);
 
         // Calculate stats
@@ -202,6 +218,16 @@ const CustomerDashboard = () => {
   const getDisplayName = (): string => {
     if (user?.email) return user.email.split('@')[0];
     return "Customer";
+  };
+
+  const mapStatus = (status: number): string => {
+    switch (status) {
+      case 0: return "Received";
+      case 1: return "In Progress";
+      case 2: return "Completed";
+      case 3: return "Cancelled";
+      default: return "Unknown";
+    }
   };
 
   if (isLoading) {
