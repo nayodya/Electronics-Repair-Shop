@@ -149,4 +149,33 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task<AccountDetailsDto> GetProfileAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) throw new Exception("User not found.");
+
+        return new AccountDetailsDto
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Address = user.Address,
+            ContactNumber = user.ContactNumber
+        };
+    }
+
+    public async Task UpdateProfileAsync(int userId, UpdateAccountDto dto)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) throw new Exception("User not found.");
+
+        user.FirstName = dto.FirstName;
+        user.LastName = dto.LastName;
+        user.Address = dto.Address;
+        user.ContactNumber = dto.ContactNumber;
+
+        await _context.SaveChangesAsync();
+    }
+
+
 }
