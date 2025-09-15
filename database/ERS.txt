@@ -2,11 +2,11 @@ CREATE TABLE Users (
   UserId INT IDENTITY(1,1) PRIMARY KEY,
   Email NVARCHAR(256) NOT NULL UNIQUE,
   PasswordHash NVARCHAR(512) NOT NULL,
-  [IsEmailVerified] BIT NOT NULL DEFAULT 0,
-  [VerificationToken] NVARCHAR(255) NULL,        
-  [VerificationTokenExpires] DATETIME NULL,        
-  [PasswordResetToken] NVARCHAR(255) NULL,        
-  [PasswordResetTokenExpires] DATETIME NULL,
+  IsEmailVerified BIT NOT NULL DEFAULT 0,
+  VerificationToken NVARCHAR(255) NULL,        
+  VerificationTokenExpires DATETIME NULL,        
+  PasswordResetToken NVARCHAR(255) NULL,        
+  PasswordResetTokenExpires DATETIME NULL,
   FirstName NVARCHAR(100),
   LastName NVARCHAR(100),
   PhoneNum NVARCHAR(20),
@@ -24,7 +24,7 @@ CREATE TABLE Devices (
  SerialNumber NVARCHAR(100),
  );
 
-
+	
  CREATE TABLE RepairRequests (
  RepairRequestId INT IDENTITY PRIMARY KEY,
  ReferenceNumber NVARCHAR(50) NOT NULL UNIQUE,
@@ -74,3 +74,20 @@ CREATE TABLE Parts (
  TransactionId NVARCHAR(200),
  PaidAt DATETIME2
  );
+
+
+CREATE TABLE Users (
+    UserId INT IDENTITY(1,1) PRIMARY KEY,
+    Email NVARCHAR(256) NULL UNIQUE,
+    PasswordHash NVARCHAR(512) NULL,
+    FullName NVARCHAR(100) NULL,
+    Phone NVARCHAR(20) NULL,
+    Role NVARCHAR(50) NULL, -- "Customer", "Technician", "Admin"
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    EmailVerifiedAt DATETIME2 NULL,
+    VerificationToken NVARCHAR(255) NULL,
+    VerificationTokenExpiresAt DATETIME2 NULL,
+    PasswordResetToken NVARCHAR(255) NULL,
+    ResetTokenExpiresAt DATETIME2 NULL,
+);
+

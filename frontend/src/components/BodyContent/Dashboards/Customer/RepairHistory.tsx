@@ -28,14 +28,32 @@ const RepairHistory = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get("/repairs/my-orders", {
+        const res = await api.get("/Repair/my-requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setOrders(res.data);
+        // Map backend data to frontend shape
+        const mappedOrders: RepairOrder[] = res.data.map((item: any) => ({
+          repairRequestId: item.requestId,
+          referenceNumber: item.referenceNumber,
+          device: {
+            make: item.brand,
+            model: item.model,
+            serialNumber: "", // or item.serialNumber if available
+            deviceType: "",   // or item.deviceType if available
+          },
+          status: mapStatus(item.status), // convert status number to string
+          issueDescription: item.description || item.issue || "",
+          createdAt: item.submittedAt,
+          estimatedCost: item.estimatedCost,
+          completedAt: item.completedAt,
+        }));
+        setOrders(mappedOrders);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to fetch orders.");
       } finally {
@@ -44,6 +62,16 @@ const RepairHistory = () => {
     };
     fetchOrders();
   }, [token]);
+
+  const mapStatus = (status: number): string => {
+    switch (status) {
+      case 0: return "Received";
+      case 1: return "In Progress";
+      case 2: return "Completed";
+      case 3: return "Cancelled";
+      default: return "Unknown";
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -210,7 +238,10 @@ const RepairHistory = () => {
                 )}
 
                 <div className="order-actions">
-                  <button className="view-details-button">
+                  <button
+                    className="view-details-button"
+                    onClick={() => navigate("/customer/repair-order-details", { state: { order } })}
+                  >
                     View Details
                   </button>
                   {order.status.toLowerCase() === "completed" && (

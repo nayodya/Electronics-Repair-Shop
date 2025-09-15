@@ -35,9 +35,9 @@ const DashboardNavBar: React.FC = () => {
         return (
           <>
             <Link to="/customer/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/customer/orders" className="nav-link">My Orders</Link>
-            <Link to="/customer/new-order" className="nav-link">New Order</Link>
-            <Link to="/customer/profile" className="nav-link">Profile</Link>
+            <Link to="/customer/add-repair" className="nav-link">New Order</Link>
+            <Link to="/customer/repair-orders" className="nav-link">My Orders</Link>
+            <Link to="/customer/edit-profile" className="nav-link">Profile</Link>
           </>
         );
       default:

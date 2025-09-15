@@ -96,4 +96,38 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [Authorize]
+    [HttpGet("my-account")]
+    public async Task<IActionResult> GetMyAccount()
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var account = await _authService.GetProfileAsync(userId);
+            return Ok(account);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("update-account")]
+    public async Task<IActionResult> UpdateAccount([FromBody] UpdateAccountDto dto)
+    {
+        try
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            await _authService.UpdateProfileAsync(userId, dto);
+            return Ok(new { message = "Account updated successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+
 }
