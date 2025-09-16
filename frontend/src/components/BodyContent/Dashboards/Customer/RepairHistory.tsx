@@ -28,9 +28,7 @@ const RepairHistory = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<RepairOrder | null>(null);
-  const [showModal, setShowModal] = useState(false);
-
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
