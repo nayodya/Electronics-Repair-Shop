@@ -1,0 +1,42 @@
+CREATE TABLE [dbo].[Users] (
+    [UserId] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [Email] NVARCHAR(256) NOT NULL,
+    [PasswordHash] NVARCHAR(MAX) NOT NULL,
+    [Role] NVARCHAR(MAX) NOT NULL,
+    [VerificationToken] NVARCHAR(MAX) NULL,
+    [VerificationTokenExpiresAt] DATETIME2 NULL,
+    [EmailVerifiedAt] DATETIME2 NULL,
+    [PasswordResetToken] NVARCHAR(MAX) NULL,
+    [ResetTokenExpiresAt] DATETIME2 NULL,
+    [FirstName] NVARCHAR(MAX) NULL,
+    [LastName] NVARCHAR(MAX) NULL,
+    [Address] NVARCHAR(MAX) NULL,
+    [ContactNumber] NVARCHAR(MAX) NULL
+);
+
+CREATE TABLE [dbo].[RepairRequests] (
+    [RequestId] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [ReferenceNumber] NVARCHAR(50) NOT NULL,
+    [CustomerId] INT NOT NULL,
+    [Device] NVARCHAR(MAX) NOT NULL,
+    [Brand] NVARCHAR(MAX) NOT NULL,
+    [Model] NVARCHAR(MAX) NOT NULL,
+    [Issue] NVARCHAR(MAX) NOT NULL,
+    [Description] NVARCHAR(MAX) NULL,
+    [Status] INT NOT NULL DEFAULT 0,  -- Enum stored as int
+    [SubmittedAt] DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    [EstimatedCompletionDays] INT NULL,
+    [TechnicianId] INT NULL,
+    CONSTRAINT FK_RepairRequests_Customers FOREIGN KEY (CustomerId) REFERENCES [dbo].[Users](UserId),
+    CONSTRAINT FK_RepairRequests_Technicians FOREIGN KEY (TechnicianId) REFERENCES [dbo].[Users](UserId)
+);
+
+
+CREATE TABLE [dbo].[Payments] (
+    [PaymentId] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    [RequestId] INT NOT NULL,
+    [TotalAmount] DECIMAL(18,2) NOT NULL,
+    [AdvancedPayment] DECIMAL(18,2) NULL,
+    [PaymentDate] DATETIME2 NULL,
+    CONSTRAINT FK_Payments_RepairRequests FOREIGN KEY (RequestId) REFERENCES [dbo].[RepairRequests](RequestId)
+);
