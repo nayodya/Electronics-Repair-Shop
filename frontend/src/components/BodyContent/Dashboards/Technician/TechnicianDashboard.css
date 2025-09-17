@@ -1,0 +1,111 @@
+.tech-dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(30, 60, 114, 0.08);
+  padding: 2.5rem 2rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #1e293b;
+}
+
+.tech-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.tech-dashboard-user {
+  margin-right: 1.2rem;
+  font-weight: 500;
+  color: #1e3c72;
+}
+
+.tech-dashboard-logout {
+  background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tech-dashboard-logout:hover {
+  background: linear-gradient(90deg, #ffd700 0%, #ffed4a 100%);
+  color: #1e3c72;
+}
+
+.tech-dashboard-section-title {
+  font-size: 1.3rem;
+  color: #1e3c72;
+  margin-bottom: 1.2rem;
+}
+
+.tech-dashboard-message,
+.tech-dashboard-error {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 1.1rem;
+}
+
+.tech-dashboard-error {
+  color: #c0392b;
+}
+
+.tech-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.tech-order-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(30, 60, 114, 0.07);
+  padding: 1.2rem 1.5rem;
+  border-left: 5px solid #1e3c72;
+}
+
+.tech-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.tech-order-ref {
+  font-weight: 600;
+  color: #2a5298;
+}
+
+.tech-order-status {
+  padding: 0.3rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #1e3c72;
+  text-transform: capitalize;
+}
+
+.status-received { background: #e0e7ff; color: #3730a3; }
+.status-in-progress { background: #fffde7; color: #b59f00; }
+.status-completed { background: #e6ffed; color: #15803d; }
+.status-cancelled { background: #ffeaea; color: #c0392b; }
+
+.tech-order-details > div {
+  margin-bottom: 0.3rem;
+  font-size: 1.02rem;
+}
+
+@media (max-width: 700px) {
+  .tech-dashboard-container {
+    padding: 1.2rem 0.5rem;
+  }
+  .tech-order-card {
+    padding: 1rem 0.7rem;
+  }
+}
