@@ -18,7 +18,7 @@ import AddRepairOrderPage from "./components/BodyContent/Dashboards/Customer/Add
 import RepairHistory from "./components/BodyContent/Dashboards/Customer/RepairHistory";
 import RepairOrderDetails from "./components/BodyContent/Dashboards/Customer/RepairOrderDetails";
 
-import TechnicianDashboard from "./components/BodyContent/Dashboards/TechnicianDashboard";
+import TechnicianDashboard from "./components/BodyContent/Dashboards/Technician/TechnicianDashboard";
 import AdminDashboard from "./components/BodyContent/Dashboards/Admin/AdminDashboard";
 import PublicLayout from "./components/layouts/PublicLayout";
 import DashboardLayout from "./components/layouts/DashboardLayout";
