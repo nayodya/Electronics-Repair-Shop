@@ -26,7 +26,7 @@ const DashboardNavBar: React.FC = () => {
         return (
           <>
             <Link to="/technician/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/technician/jobs" className="nav-link">Jobs</Link>
+            <Link to="/technician/repairs" className="nav-link">Repairs</Link>
             <Link to="/technician/schedule" className="nav-link">Schedule</Link>
             <Link to="/technician/profile" className="nav-link">Profile</Link>
           </>

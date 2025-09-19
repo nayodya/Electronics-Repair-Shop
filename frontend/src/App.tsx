@@ -26,6 +26,7 @@ import ManageRequests from "./components/BodyContent/Dashboards/Admin/ManageRequ
 import ManageTechnicians from "./components/BodyContent/Dashboards/Admin/ManageTechnicians";
 import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
 import CustomerDetails from "./components/BodyContent/Dashboards/Customer/Proofile";
+import RepairingStatus from "./components/BodyContent/Dashboards/Technician/RepairingStatus";
 
 function App() {
   return (
@@ -63,7 +64,7 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="dashboard" element={<TechnicianDashboard />} />
-          <Route path="jobs" element={<div>Technician Jobs</div>} />
+          <Route path="repairs" element={<div><RepairingStatus/></div>} />
           <Route path="schedule" element={<div>Technician Schedule</div>} />
           <Route path="profile" element={<div>Technician Profile</div>} />
         </Route>
