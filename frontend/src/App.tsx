@@ -27,6 +27,7 @@ import ManageTechnicians from "./components/BodyContent/Dashboards/Admin/ManageT
 import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
 import CustomerDetails from "./components/BodyContent/Dashboards/Customer/Proofile";
 import RepairingStatus from "./components/BodyContent/Dashboards/Technician/RepairingStatus";
+import ManagePayments from "./components/BodyContent/Dashboards/Admin/ManagePayments";
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
           <Route path="dashboard/requests" element={<div>{<ManageRequests/>}</div>} />
           <Route path="dashboard/users" element={<div>{<ManageTechnicians/>}</div>} />
           <Route path="dashboard/technicians" element={<div>{<ManageUsers/>}</div>} />
+          <Route path="dashboard/payments" element={<div>{<ManagePayments/>}</div>} />
         </Route>
 
         {/* Catch-all route for 404 */}
