@@ -4,16 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace backend.Models;
 
 // Enum for the different states of a repair request
+// Add to your RepairRequest model if not already present
 public enum RepairStatus
 {
-    Submitted,
-    Received,
-    Assigned,
-    InProgress,
-    Finished,
-    ToDeliver,
-    Delivered,
-    Cancelled
+    Received = 0,
+    InProgress = 1,
+    Completed = 2,
+    Cancelled = 3,
+    ReadyForDelivery = 4,
+    Delivered = 5
 }
 
 // Model for the Repair Request
@@ -46,7 +45,7 @@ public class RepairRequest
     public string? Description { get; set; }
 
     [Required]
-    public RepairStatus Status { get; set; } = RepairStatus.Submitted;
+    public RepairStatus Status { get; set; } = RepairStatus.Received;
 
     public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
@@ -55,7 +54,7 @@ public class RepairRequest
     public int? TechnicianId { get; set; }
     [ForeignKey("TechnicianId")]
     public User? Technician { get; set; }
-
+    
     public Payment? PaymentDetails { get; set; }
 
 }
