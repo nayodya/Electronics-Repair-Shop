@@ -27,7 +27,7 @@ public class RepairService : IRepairService
             Model = dto.Model,
             Issue = dto.Issue,
             Description = dto.Description,
-            Status = RepairStatus.Submitted,
+            Status = RepairStatus.Received,
             SubmittedAt = DateTime.UtcNow
         };
 
@@ -130,7 +130,7 @@ public class RepairService : IRepairService
         }
 
         request.TechnicianId = technicianId;
-        request.Status = RepairStatus.Assigned;
+        request.Status = RepairStatus.InProgress;
         await _context.SaveChangesAsync();
     }
 

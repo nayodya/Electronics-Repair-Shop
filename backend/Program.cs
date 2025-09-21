@@ -22,6 +22,7 @@ builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("S
 builder.Services.AddTransient<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRepairService, RepairService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 builder.Services.AddAuthentication(options =>
 {
