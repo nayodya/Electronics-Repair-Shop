@@ -78,8 +78,8 @@ function App() {
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="dashboard/requests" element={<div>{<ManageRequests/>}</div>} />
-          <Route path="dashboard/users" element={<div>{<ManageTechnicians/>}</div>} />
-          <Route path="dashboard/technicians" element={<div>{<ManageUsers/>}</div>} />
+          <Route path="dashboard/technicians" element={<div>{<ManageTechnicians/>}</div>} />
+          <Route path="dashboard/users" element={<div>{<ManageUsers/>}</div>} />
           <Route path="dashboard/payments" element={<div>{<ManagePayments/>}</div>} />
         </Route>
 

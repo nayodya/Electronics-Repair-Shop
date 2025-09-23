@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../../services/api";
-import "./AdminStyles.css";
+import './ManageRequests.css';
 
 interface RepairRequest {
   requestId: number;
   referenceNumber: string;
   customerId: number;
-  customer: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  customerEmail: string;
   device: string;
   brand: string;
   model: string;
   issue: string;
-  description: string;
+  description?: string;
   status: number;
   submittedAt: string;
-  estimatedCompletionDays: number;
-  technicianId?: number;
-  technician?: {
-    firstName: string;
-    lastName: string;
-  };
+  estimatedCompletionDays: number | null;
+  technicianId?: number | null;
+  technicianEmail?: string | null;
+  hasPayment: boolean;
+  paymentAmount: number;
 }
 
 interface Technician {
   userId: number;
   firstName: string;
   lastName: string;
+  email: string;
+}
+
+interface PaymentDto {
+  amount: number;
+  advancedPayment?: number;
 }
 
 const ManageRequests: React.FC = () => {
@@ -38,7 +39,16 @@ const ManageRequests: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<RepairRequest | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  
+  // Payment form state
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [paymentData, setPaymentData] = useState<PaymentDto>({
+    amount: 0,
+    advancedPayment: 0
+  });
+  const [selectedPaymentRequest, setSelectedPaymentRequest] = useState<RepairRequest | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -48,13 +58,45 @@ const ManageRequests: React.FC = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
-      const res = await api.get("/admin/repairs", {
+      
+      if (!token) {
+        setError("No authentication token found");
+        return;
+      }
+
+      // Use the correct endpoint without /debug
+      const res = await api.get("/Admin/repairs/debug", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setRequests(res.data);
+      
+      console.log("API Response:", res.data);
+      
+      // Handle the API response structure {count, data}
+      let requestsData = [];
+      if (res.data && res.data.data && Array.isArray(res.data.data)) {
+        requestsData = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        requestsData = res.data;
+      } else {
+        console.error("Unexpected API response format:", res.data);
+        setError("Unexpected data format from server");
+        return;
+      }
+      
+      // Validate each request item
+      const validatedRequests = requestsData.filter((item: any) => {
+        return item && typeof item === 'object' && item.requestId;
+      });
+      
+      setRequests(validatedRequests);
+      
     } catch (err: any) {
-      setMessage("Failed to fetch requests: " + (err.response?.data?.message || err.message));
+      console.error("Fetch requests error:", err);
+      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch requests";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -63,27 +105,49 @@ const ManageRequests: React.FC = () => {
   const fetchTechnicians = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.get("/admin/technicians", {
+      
+      if (!token) {
+        console.error("No token for fetching technicians");
+        return;
+      }
+
+      // Use the correct endpoint
+      const res = await api.get("/Admin/technicians", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTechnicians(res.data);
+      
+      const techniciansData = Array.isArray(res.data) ? res.data : [];
+      setTechnicians(techniciansData);
+      
     } catch (err: any) {
-      console.error("Failed to fetch technicians", err);
+      console.error("Failed to fetch technicians:", err);
+      // Don't show error for technicians - it's not critical
     }
   };
 
   const assignTechnician = async (requestId: number, technicianId: number) => {
+    if (!technicianId) return;
+    
     try {
       setLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
-      await api.put(`/admin/repairs/${requestId}/assign-technician`, 
+      
+      await api.put(`/Admin/repairs/${requestId}/assign-technician`, 
         { technicianId }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
       setMessage("✅ Technician assigned successfully!");
-      fetchRequests();
+      await fetchRequests();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+      
     } catch (err: any) {
-      setMessage("❌ Failed to assign technician: " + (err.response?.data?.message || err.message));
+      const errorMessage = err.response?.data?.message || err.message || "Failed to assign technician";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -92,15 +156,24 @@ const ManageRequests: React.FC = () => {
   const updateStatus = async (requestId: number, status: number) => {
     try {
       setLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
-      await api.put(`/admin/repairs/${requestId}/update-status`, 
+      
+      await api.put(`/Admin/repairs/${requestId}/update-status`, 
         { status }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
       setMessage("✅ Status updated successfully!");
-      fetchRequests();
+      await fetchRequests();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+      
     } catch (err: any) {
-      setMessage("❌ Failed to update status: " + (err.response?.data?.message || err.message));
+      const errorMessage = err.response?.data?.message || err.message || "Failed to update status";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -111,20 +184,79 @@ const ManageRequests: React.FC = () => {
     
     try {
       setLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
-      await api.delete(`/admin/repairs/${requestId}`, {
+      
+      // Remove /debug from the endpoint
+      await api.delete(`/Admin/repairs/debug/${requestId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       setMessage("✅ Repair request deleted successfully!");
-      fetchRequests();
+      await fetchRequests();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+      
     } catch (err: any) {
-      setMessage("❌ Failed to delete request: " + (err.response?.data?.message || err.message));
+      const errorMessage = err.response?.data?.message || err.message || "Failed to delete request";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusText = (status: number) => {
+  // Payment functions
+  const openPaymentForm = (request: RepairRequest) => {
+    setSelectedPaymentRequest(request);
+    setPaymentData({
+      amount: request.hasPayment ? request.paymentAmount : 0,
+      advancedPayment: 0
+    });
+    setShowPaymentForm(true);
+    setError("");
+  };
+
+  const closePaymentForm = () => {
+    setShowPaymentForm(false);
+    setSelectedPaymentRequest(null);
+    setPaymentData({ amount: 0, advancedPayment: 0 });
+    setError("");
+  };
+
+  const handleUpdatePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPaymentRequest) return;
+
+    try {
+      setLoading(true);
+      setError("");
+      const token = localStorage.getItem("token");
+      
+      await api.put(`/Admin/repairs/${selectedPaymentRequest.requestId}/payment`, paymentData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      setMessage("✅ Payment updated successfully!");
+      setShowPaymentForm(false);
+      setSelectedPaymentRequest(null);
+      await fetchRequests();
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
+      
+    } catch (err: any) {
+      console.error("Failed to update payment:", err);
+      const errorMessage = err.response?.data?.message || err.message || "Failed to update payment";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusText = (status: number): string => {
     const statusMap: { [key: number]: string } = {
       0: "Received",
       1: "In Progress", 
@@ -136,9 +268,45 @@ const ManageRequests: React.FC = () => {
     return statusMap[status] || "Unknown";
   };
 
-  const filteredRequests = requests.filter(req => 
-    filterStatus === "all" || req.status.toString() === filterStatus
-  );
+  const getStatusClass = (status: number): string => {
+    const statusClassMap: { [key: number]: string } = {
+      0: "received",
+      1: "in-progress",
+      2: "completed",
+      3: "cancelled",
+      4: "ready-for-delivery",
+      5: "delivered"
+    };
+    return statusClassMap[status] || "unknown";
+  };
+
+  // Safe filtering with proper null checks
+  const filteredRequests = requests.filter(req => {
+    if (!req || typeof req !== 'object') return false;
+    return filterStatus === "all" || req.status?.toString() === filterStatus;
+  });
+
+  // Error boundary fallback
+  if (error && !loading && !showPaymentForm) {
+    return (
+      <div className="admin-container">
+        <div className="admin-error">
+          <h3>⚠️ Error Loading Requests</h3>
+          <p>{error}</p>
+          <button 
+            className="admin-btn admin-btn-primary"
+            onClick={() => {
+              setError("");
+              setMessage("");
+              fetchRequests();
+            }}
+          >
+            🔄 Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
@@ -158,13 +326,41 @@ const ManageRequests: React.FC = () => {
             <option value="4">Ready for Delivery</option>
             <option value="5">Delivered</option>
           </select>
+          <button 
+            className="admin-btn admin-btn-secondary"
+            onClick={() => {
+              setError("");
+              setMessage("");
+              fetchRequests();
+            }}
+            disabled={loading}
+          >
+            🔄 Refresh
+          </button>
         </div>
       </div>
 
-      {message && <div className="admin-message">{message}</div>}
+      {message && (
+        <div className={`admin-message ${message.includes('❌') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
 
       {loading ? (
-        <div className="admin-loading">Loading requests...</div>
+        <div className="admin-loading">
+          <div className="loading-spinner"></div>
+          Loading requests...
+        </div>
+      ) : filteredRequests.length === 0 ? (
+        <div className="admin-no-data">
+          <h3>📝 No Repair Requests Found</h3>
+          <p>
+            {filterStatus === "all" 
+              ? "There are no repair requests to display." 
+              : `No requests found with status: ${getStatusText(parseInt(filterStatus))}`
+            }
+          </p>
+        </div>
       ) : (
         <div className="admin-table-container">
           <table className="admin-table">
@@ -175,6 +371,7 @@ const ManageRequests: React.FC = () => {
                 <th>Device</th>
                 <th>Issue</th>
                 <th>Status</th>
+                <th>Payment</th>
                 <th>Technician</th>
                 <th>Date</th>
                 <th>Actions</th>
@@ -183,35 +380,71 @@ const ManageRequests: React.FC = () => {
             <tbody>
               {filteredRequests.map((request) => (
                 <tr key={request.requestId}>
-                  <td>{request.referenceNumber}</td>
+                  <td className="ref-number">{request.referenceNumber || 'N/A'}</td>
                   <td>
-                    <div>
-                      <strong>{request.customer.firstName} {request.customer.lastName}</strong>
+                    <div className="customer-info">
+                      <strong>{request.customerEmail?.split('@')[0] || 'Unknown'}</strong>
                       <br />
-                      <small>{request.customer.email}</small>
+                      <small>{request.customerEmail || 'No email'}</small>
                     </div>
                   </td>
                   <td>
-                    <div>
-                      <strong>{request.brand} {request.model}</strong>
+                    <div className="device-info">
+                      <strong>{request.brand || ''} {request.model || ''}</strong>
                       <br />
-                      <small>{request.device}</small>
+                      <small>{request.device || 'No device info'}</small>
                     </div>
                   </td>
-                  <td>{request.issue}</td>
+                  <td className="issue-text">{request.issue || 'No issue description'}</td>
                   <td>
-                    <span className={`admin-badge admin-badge-status-${request.status}`}>
+                    <span className={`status-badge status-${getStatusClass(request.status)}`}>
                       {getStatusText(request.status)}
                     </span>
                   </td>
                   <td>
-                    {request.technician ? (
-                      <span>{request.technician.firstName} {request.technician.lastName}</span>
+                    <div className="payment-info">
+                      {request.hasPayment ? (
+                        <div className="payment-amount">
+                          <span className="payment-badge payment-paid">
+                            💰 ${request.paymentAmount.toFixed(2)}
+                          </span>
+                          <button 
+                            className="admin-btn admin-btn-info admin-btn-small"
+                            onClick={() => openPaymentForm(request)}
+                            disabled={loading}
+                            title="Update payment"
+                          >
+                            ✏️ Edit
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          className="admin-btn admin-btn-primary admin-btn-small"
+                          onClick={() => openPaymentForm(request)}
+                          disabled={loading}
+                          title="Add payment"
+                        >
+                          💰 Add Payment
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    {request.technicianEmail ? (
+                      <span className="technician-assigned">
+                        {request.technicianEmail}
+                      </span>
                     ) : (
                       <select 
-                        onChange={(e) => assignTechnician(request.requestId, parseInt(e.target.value))}
+                        onChange={(e) => {
+                          const techId = parseInt(e.target.value);
+                          if (techId) {
+                            assignTechnician(request.requestId, techId);
+                          }
+                        }}
                         className="admin-select-small"
                         defaultValue=""
+                        disabled={loading}
                       >
                         <option value="">Assign Technician</option>
                         {technicians.map(tech => (
@@ -222,19 +455,28 @@ const ManageRequests: React.FC = () => {
                       </select>
                     )}
                   </td>
-                  <td>{new Date(request.submittedAt).toLocaleDateString()}</td>
+                  <td className="date-cell">
+                    {request.submittedAt ? new Date(request.submittedAt).toLocaleDateString() : 'N/A'}
+                  </td>
                   <td>
                     <div className="admin-actions">
                       <button 
                         className="admin-btn admin-btn-info admin-btn-small"
                         onClick={() => setSelectedRequest(request)}
+                        disabled={loading}
                       >
                         👁️ View
                       </button>
                       <select 
-                        onChange={(e) => updateStatus(request.requestId, parseInt(e.target.value))}
+                        onChange={(e) => {
+                          const newStatus = parseInt(e.target.value);
+                          if (newStatus !== request.status) {
+                            updateStatus(request.requestId, newStatus);
+                          }
+                        }}
                         className="admin-select-small"
                         value={request.status}
+                        disabled={loading}
                       >
                         <option value={0}>Received</option>
                         <option value={1}>In Progress</option>
@@ -246,6 +488,7 @@ const ManageRequests: React.FC = () => {
                       <button 
                         className="admin-btn admin-btn-danger admin-btn-small"
                         onClick={() => deleteRequest(request.requestId)}
+                        disabled={loading}
                       >
                         🗑️ Delete
                       </button>
@@ -255,6 +498,126 @@ const ManageRequests: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Payment Form Modal */}
+      {showPaymentForm && selectedPaymentRequest && (
+        <div className="admin-modal-overlay" onClick={closePaymentForm}>
+          <div className="admin-modal payment-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <h3>
+                💰 {selectedPaymentRequest.hasPayment ? 'Update Payment' : 'Add Payment'} - {selectedPaymentRequest.referenceNumber}
+              </h3>
+              <button 
+                className="admin-modal-close"
+                onClick={closePaymentForm}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="admin-modal-content">
+              {error && (
+                <div className="payment-error">
+                  ⚠️ {error}
+                </div>
+              )}
+              
+              <div className="payment-request-info">
+                <h4>📱 Request Information</h4>
+                <div className="request-info-grid">
+                  <div>
+                    <strong>Customer:</strong> {selectedPaymentRequest.customerEmail}
+                  </div>
+                  <div>
+                    <strong>Device:</strong> {selectedPaymentRequest.brand} {selectedPaymentRequest.model}
+                  </div>
+                  <div>
+                    <strong>Issue:</strong> {selectedPaymentRequest.issue}
+                  </div>
+                  <div>
+                    <strong>Status:</strong> 
+                    <span className={`status-badge status-${getStatusClass(selectedPaymentRequest.status)}`}>
+                      {getStatusText(selectedPaymentRequest.status)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdatePayment} className="payment-form">
+                <div className="payment-form-grid">
+                  <div className="payment-form-group">
+                    <label>
+                      <span>💵</span>
+                      Total Amount ($) *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={paymentData.amount}
+                      onChange={(e) => setPaymentData({...paymentData, amount: Number(e.target.value)})}
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+
+                  <div className="payment-form-group">
+                    <label>
+                      <span>💳</span>
+                      Advanced Payment ($)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={paymentData.amount}
+                      value={paymentData.advancedPayment || 0}
+                      onChange={(e) => setPaymentData({...paymentData, advancedPayment: Number(e.target.value)})}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="payment-summary">
+                  <h4>💰 Payment Summary</h4>
+                  <div className="summary-grid">
+                    <div className="summary-item">
+                      <span>Total Amount:</span>
+                      <strong>${paymentData.amount.toFixed(2)}</strong>
+                    </div>
+                    <div className="summary-item">
+                      <span>Advanced Payment:</span>
+                      <strong>${(paymentData.advancedPayment || 0).toFixed(2)}</strong>
+                    </div>
+                    <div className="summary-item summary-remaining">
+                      <span>Remaining Balance:</span>
+                      <strong>${(paymentData.amount - (paymentData.advancedPayment || 0)).toFixed(2)}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="payment-form-actions">
+                  <button 
+                    type="submit" 
+                    className="admin-btn admin-btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? "⏳ Processing..." : selectedPaymentRequest.hasPayment ? "💾 Update Payment" : "💰 Add Payment"}
+                  </button>
+                  <button 
+                    type="button" 
+                    className="admin-btn admin-btn-secondary"
+                    onClick={closePaymentForm}
+                    disabled={loading}
+                  >
+                    ❌ Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       )}
 
@@ -276,33 +639,57 @@ const ManageRequests: React.FC = () => {
               <div className="admin-request-details">
                 <div className="admin-detail-section">
                   <h4>👤 Customer Information</h4>
-                  <p><strong>Name:</strong> {selectedRequest.customer.firstName} {selectedRequest.customer.lastName}</p>
-                  <p><strong>Email:</strong> {selectedRequest.customer.email}</p>
+                  <p><strong>Email:</strong> {selectedRequest.customerEmail || 'No email'}</p>
+                  <p><strong>Customer ID:</strong> {selectedRequest.customerId}</p>
                 </div>
 
                 <div className="admin-detail-section">
                   <h4>📱 Device Information</h4>
-                  <p><strong>Device:</strong> {selectedRequest.device}</p>
-                  <p><strong>Brand:</strong> {selectedRequest.brand}</p>
-                  <p><strong>Model:</strong> {selectedRequest.model}</p>
-                  <p><strong>Issue:</strong> {selectedRequest.issue}</p>
-                  <p><strong>Description:</strong> {selectedRequest.description}</p>
+                  <p><strong>Device:</strong> {selectedRequest.device || 'Not specified'}</p>
+                  <p><strong>Brand:</strong> {selectedRequest.brand || 'Not specified'}</p>
+                  <p><strong>Model:</strong> {selectedRequest.model || 'Not specified'}</p>
+                  <p><strong>Issue:</strong> {selectedRequest.issue || 'No issue description'}</p>
+                  <p><strong>Description:</strong> {selectedRequest.description || 'No description'}</p>
                 </div>
 
                 <div className="admin-detail-section">
                   <h4>🔧 Repair Information</h4>
                   <p><strong>Status:</strong> 
-                    <span className={`admin-badge admin-badge-status-${selectedRequest.status}`}>
+                    <span className={`status-badge status-${getStatusClass(selectedRequest.status)}`}>
                       {getStatusText(selectedRequest.status)}
                     </span>
                   </p>
-                  <p><strong>Submitted:</strong> {new Date(selectedRequest.submittedAt).toLocaleString()}</p>
-                  <p><strong>Estimated Days:</strong> {selectedRequest.estimatedCompletionDays}</p>
-                  <p><strong>Technician:</strong> {
-                    selectedRequest.technician 
-                      ? `${selectedRequest.technician.firstName} ${selectedRequest.technician.lastName}`
-                      : "Not assigned"
+                  <p><strong>Submitted:</strong> {
+                    selectedRequest.submittedAt 
+                      ? new Date(selectedRequest.submittedAt).toLocaleString()
+                      : 'Not available'
                   }</p>
+                  <p><strong>Estimated Days:</strong> {selectedRequest.estimatedCompletionDays || 'Not specified'}</p>
+                  <p><strong>Technician:</strong> {
+                    selectedRequest.technicianEmail || "Not assigned"
+                  }</p>
+                </div>
+
+                <div className="admin-detail-section">
+                  <h4>💰 Payment Information</h4>
+                  <p><strong>Payment Status:</strong> {
+                    selectedRequest.hasPayment 
+                      ? <span className="payment-badge payment-paid">✅ Payment Added</span>
+                      : <span className="payment-badge payment-pending">⏳ Payment Pending</span>
+                  }</p>
+                  {selectedRequest.hasPayment && (
+                    <p><strong>Amount:</strong> ${selectedRequest.paymentAmount.toFixed(2)}</p>
+                  )}
+                  <button 
+                    className="admin-btn admin-btn-primary admin-btn-small"
+                    onClick={() => {
+                      setSelectedRequest(null);
+                      openPaymentForm(selectedRequest);
+                    }}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    {selectedRequest.hasPayment ? '✏️ Edit Payment' : '💰 Add Payment'}
+                  </button>
                 </div>
               </div>
             </div>
