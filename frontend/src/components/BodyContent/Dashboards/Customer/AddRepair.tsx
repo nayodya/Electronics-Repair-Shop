@@ -8,15 +8,17 @@ const AddRepairOrderPage = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    make: "",
+    device: "",
+    brand: "",
     model: "",
-    serialNumber: "",
-    issueDescription: "",
-    deviceType: ""
+    issue: "",
+    description: ""
   });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const deviceTypes = [
     "Smartphone",
@@ -42,21 +44,25 @@ const AddRepairOrderPage = () => {
 
     try {
       const res = await api.post(
-        "/repairs/submit",
+        "Repair/submit",
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      setReferenceNumber(res.data.referenceNumber);
       setMessage(`Repair Request Created Successfully! Reference Number: ${res.data.referenceNumber}`);
       setIsSuccess(true);
+      setShowSuccessModal(true);
+      
       // Clear form
       setFormData({
-        make: "",
+        device: "",
+        brand: "",
         model: "",
-        serialNumber: "",
-        issueDescription: "",
-        deviceType: ""
+        issue: "",
+        description: ""
       });
-      setTimeout(()=> navigate("/customer/dashboard"),300)
+      
 
     } catch (err: any) {
       setMessage(err.response?.data?.message || "Failed to create repair request.");
@@ -64,6 +70,16 @@ const AddRepairOrderPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    navigate("/customer/dashboard");
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(referenceNumber);
+    // You could add a toast notification here
   };
 
   return (
@@ -85,11 +101,11 @@ const AddRepairOrderPage = () => {
             <h3>Device Information</h3>
 
             <div className="form-group">
-              <label htmlFor="deviceType">Device Type</label>
+              <label htmlFor="device">Device Type</label>
               <select
-                id="deviceType"
-                name="deviceType"
-                value={formData.deviceType}
+                id="device"
+                name="device"
+                value={formData.device}
                 onChange={handleChange}
                 required
               >
@@ -102,12 +118,12 @@ const AddRepairOrderPage = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="make">Device Make</label>
+                <label htmlFor="brand">Device Brand</label>
                 <input
                   type="text"
-                  id="make"
-                  name="make"
-                  value={formData.make}
+                  id="brand"
+                  name="brand"
+                  value={formData.brand}
                   onChange={handleChange}
                   placeholder="e.g., Apple, Samsung, HP"
                   required
@@ -129,14 +145,14 @@ const AddRepairOrderPage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="serialNumber">Serial Number</label>
+              <label htmlFor="issue">Issue Summary</label>
               <input
                 type="text"
-                id="serialNumber"
-                name="serialNumber"
-                value={formData.serialNumber}
+                id="issue"
+                name="issue"
+                value={formData.issue}
                 onChange={handleChange}
-                placeholder="Enter device serial number"
+                placeholder="Brief description of the problem"
                 required
               />
             </div>
@@ -145,11 +161,11 @@ const AddRepairOrderPage = () => {
           <div className="form-section">
             <h3>Issue Description</h3>
             <div className="form-group">
-              <label htmlFor="issueDescription">Describe the problem</label>
+              <label htmlFor="description">Describe the problem in detail</label>
               <textarea
-                id="issueDescription"
-                name="issueDescription"
-                value={formData.issueDescription}
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
                 placeholder="Please describe the issue in detail. Include when it started, any error messages, and what you were doing when the problem occurred."
                 rows={6}
@@ -158,7 +174,7 @@ const AddRepairOrderPage = () => {
             </div>
           </div>
 
-          {message && (
+          {message && !showSuccessModal && (
             <div className={`message ${isSuccess ? 'success' : 'error'}`}>
               <div className="message-icon">
                 {isSuccess ? "✅" : "❌"}
@@ -192,6 +208,57 @@ const AddRepairOrderPage = () => {
           </div>
         </form>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal-overlay">
+          <div className="success-modal">
+            <div className="modal-header">
+              <div className="success-icon">✅</div>
+              <h2>Request Submitted Successfully!</h2>
+            </div>
+            
+            <div className="modal-body">
+              <p>Your repair request has been submitted successfully.</p>
+              <p>Please save your reference number for tracking:</p>
+              
+              <div className="reference-number-container">
+                <div className="reference-number">
+                  <span className="label">Reference Number:</span>
+                  <span className="number">{referenceNumber}</span>
+                  <button 
+                    type="button"
+                    className="copy-button"
+                    onClick={copyToClipboard}
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                </div>
+              </div>
+              
+              <div className="info-note">
+                <p><strong>What's next?</strong></p>
+                <ul>
+                  <li>You will receive an email confirmation shortly</li>
+                  <li>Our team will review your request within 24 hours</li>
+                  <li>You can track your repair status in your dashboard</li>
+                  <li>We'll contact you if we need any additional information</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="modal-actions">
+              <button 
+                className="primary-button"
+                onClick={handleCloseModal}
+              >
+                Go to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
