@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "E:\\Electronics Repair Shop\\backend\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:services\\adminservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -33,10 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\controllers\\repaircontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:controllers\\repaircontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0FFF5B6D-6858-4FAB-9283-A0B8D8AF5B31}|backend.csproj|e:\\electronics repair shop\\backend\\dto\\updateestimateddaysdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -94,7 +94,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -110,7 +110,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Payment.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Models\\Payment.cs",
               "RelativeDocumentMoniker": "Models\\Payment.cs",
@@ -134,7 +134,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "RepairService.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\RepairService.cs",
               "RelativeDocumentMoniker": "Services\\RepairService.cs",
@@ -146,7 +146,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 0,
               "Title": "appsettings.json",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -154,11 +154,12 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-15T13:18:14.107Z"
+              "WhenOpened": "2025-09-15T13:18:14.107Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "AdminController.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\AdminController.cs",
               "RelativeDocumentMoniker": "Controllers\\AdminController.cs",
@@ -170,7 +171,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "AuthController.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
@@ -182,7 +183,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "AddPaymentDto.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\AddPaymentDto.cs",
               "RelativeDocumentMoniker": "Dto\\AddPaymentDto.cs",
@@ -194,20 +195,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AdminService.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Services\\AdminService.cs",
               "RelativeDocumentMoniker": "Services\\AdminService.cs",
               "ToolTip": "E:\\Electronics Repair Shop\\backend\\Services\\AdminService.cs",
               "RelativeToolTip": "Services\\AdminService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA3AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-13T17:00:20.236Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-13T17:00:20.236Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "UserManagementDto.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Dto\\UserManagementDto.cs",
               "RelativeDocumentMoniker": "Dto\\UserManagementDto.cs",
@@ -231,7 +231,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "RepairController.cs",
               "DocumentMoniker": "E:\\Electronics Repair Shop\\backend\\Controllers\\RepairController.cs",
               "RelativeDocumentMoniker": "Controllers\\RepairController.cs",
