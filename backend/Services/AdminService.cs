@@ -177,7 +177,7 @@ namespace backend.Services
                     TotalAmount = dto.EstimatedCost.Value,
                     AdvancedPayment = null
                 };
-                
+
                 await _context.Payments.AddAsync(payment);
                 await _context.SaveChangesAsync();
             }
@@ -242,7 +242,7 @@ namespace backend.Services
         public async Task AssignTechnicianAsync(int repairId, int technicianId)
         {
             _logger.LogInformation($"Assigning technician {technicianId} to repair {repairId}.");
-            
+
             var repair = await _context.RepairRequests.FindAsync(repairId);
             if (repair == null)
             {
@@ -267,7 +267,7 @@ namespace backend.Services
         public async Task UpdateRepairStatusAsync(int repairId, UpdateRepairStatusDto dto)
         {
             _logger.LogInformation($"Updating repair status for repair {repairId} to {dto.Status}.");
-            
+
             var repair = await _context.RepairRequests.FindAsync(repairId);
             if (repair == null)
             {
@@ -282,7 +282,7 @@ namespace backend.Services
         public async Task UpdatePaymentAsync(int repairId, PaymentDto dto)
         {
             _logger.LogInformation($"Updating payment for repair {repairId}.");
-            
+
             var repair = await _context.RepairRequests
                 .Include(r => r.PaymentDetails)
                 .FirstOrDefaultAsync(r => r.RequestId == repairId);
@@ -316,7 +316,7 @@ namespace backend.Services
         public async Task MarkReadyForDeliveryAsync(int repairId)
         {
             _logger.LogInformation($"Marking repair {repairId} as ready for delivery.");
-            
+
             var repair = await _context.RepairRequests
                 .Include(r => r.PaymentDetails)
                 .FirstOrDefaultAsync(r => r.RequestId == repairId);
@@ -381,10 +381,338 @@ namespace backend.Services
             return Guid.NewGuid().ToString("N")[..8].ToUpper();
         }
 
-        public Task<IEnumerable<RepairRequest>> GetAllRepairsAsync()
+        #region Payment Management Implementation
+        public async Task<IEnumerable<PaymentResponseDto>> GetAllPaymentsAsync(PaymentFilterDto? filter = null)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Fetching all payments with filters.");
+
+            var query = _context.Payments
+                .Include(p => p.RepairRequest)
+                    .ThenInclude(r => r.Customer!)
+                .AsQueryable();
+
+            // Apply filters
+            if (filter != null)
+            {
+                if (filter.StartDate.HasValue)
+                    query = query.Where(p => p.PaymentDate >= filter.StartDate.Value);
+
+                if (filter.EndDate.HasValue)
+                    query = query.Where(p => p.PaymentDate <= filter.EndDate.Value);
+
+                if (filter.MinAmount.HasValue)
+                    query = query.Where(p => p.TotalAmount >= filter.MinAmount.Value);
+
+                if (filter.MaxAmount.HasValue)
+                    query = query.Where(p => p.TotalAmount <= filter.MaxAmount.Value);
+
+                if (filter.IsPaid.HasValue)
+                    query = query.Where(p => filter.IsPaid.Value ? p.PaymentDate != null : p.PaymentDate == null);
+
+                if (filter.RequestId.HasValue)
+                    query = query.Where(p => p.RequestId == filter.RequestId.Value);
+
+                // Apply sorting
+                if (!string.IsNullOrEmpty(filter.SortBy))
+                {
+                    var isAscending = filter.SortOrder?.ToUpper() == "ASC";
+
+                    query = filter.SortBy.ToLower() switch
+                    {
+                        "paymentdate" => isAscending
+                            ? query.OrderBy(p => p.PaymentDate)
+                            : query.OrderByDescending(p => p.PaymentDate),
+                        "totalamount" => isAscending
+                            ? query.OrderBy(p => p.TotalAmount)
+                            : query.OrderByDescending(p => p.TotalAmount),
+                        "requestid" => isAscending
+                            ? query.OrderBy(p => p.RequestId)
+                            : query.OrderByDescending(p => p.RequestId),
+                        _ => query.OrderByDescending(p => p.PaymentId)
+                    };
+                }
+
+                // Apply pagination
+                if (filter.PageNumber.HasValue && filter.PageSize.HasValue)
+                {
+                    var skip = (filter.PageNumber.Value - 1) * filter.PageSize.Value;
+                    query = query.Skip(skip).Take(filter.PageSize.Value);
+                }
+            }
+
+            var payments = await query.ToListAsync();
+
+            return payments.Select(p => new PaymentResponseDto
+            {
+                PaymentId = p.PaymentId,
+                RequestId = p.RequestId,
+                ReferenceNumber = p.RepairRequest?.ReferenceNumber,
+                CustomerEmail = p.RepairRequest?.Customer?.Email ?? "",
+                CustomerName = $"{p.RepairRequest?.Customer?.FirstName} {p.RepairRequest?.Customer?.LastName}".Trim(),
+                Device = p.RepairRequest?.Device,
+                TotalAmount = p.TotalAmount,
+                AdvancedPayment = p.AdvancedPayment,
+                RemainingBalance = p.TotalAmount - (p.AdvancedPayment ?? 0),
+                PaymentDate = p.PaymentDate,
+                IsPaid = p.PaymentDate.HasValue,
+                RepairStatus = p.RepairRequest?.Status.ToString() ?? "",
+                CreatedAt = p.RepairRequest?.SubmittedAt
+            });
+        }
+
+        public async Task<PaymentResponseDto> GetPaymentByIdAsync(int paymentId)
+        {
+            _logger.LogInformation($"Fetching payment with ID: {paymentId}.");
+
+            var payment = await _context.Payments
+                .Include(p => p.RepairRequest)
+                    .ThenInclude(r => r.Customer!)
+                .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
+
+            if (payment == null)
+            {
+                throw new KeyNotFoundException($"Payment with ID {paymentId} not found.");
+            }
+
+            return new PaymentResponseDto
+            {
+                PaymentId = payment.PaymentId,
+                RequestId = payment.RequestId,
+                ReferenceNumber = payment.RepairRequest?.ReferenceNumber,
+                CustomerEmail = payment.RepairRequest?.Customer?.Email ?? "",
+                CustomerName = $"{payment.RepairRequest?.Customer?.FirstName} {payment.RepairRequest?.Customer?.LastName}".Trim(),
+                Device = payment.RepairRequest?.Device,
+                TotalAmount = payment.TotalAmount,
+                AdvancedPayment = payment.AdvancedPayment,
+                RemainingBalance = payment.TotalAmount - (payment.AdvancedPayment ?? 0),
+                PaymentDate = payment.PaymentDate,
+                IsPaid = payment.PaymentDate.HasValue,
+                RepairStatus = payment.RepairRequest?.Status.ToString() ?? "",
+                CreatedAt = payment.RepairRequest?.SubmittedAt
+            };
+        }
+
+        public async Task<PaymentResponseDto> GetPaymentByRepairIdAsync(int repairId)
+        {
+            _logger.LogInformation($"Fetching payment for repair ID: {repairId}.");
+
+            var payment = await _context.Payments
+                .Include(p => p.RepairRequest)
+                    .ThenInclude(r => r.Customer!)
+                .FirstOrDefaultAsync(p => p.RequestId == repairId);
+
+            if (payment == null)
+            {
+                throw new KeyNotFoundException($"Payment for repair ID {repairId} not found.");
+            }
+
+            return new PaymentResponseDto
+            {
+                PaymentId = payment.PaymentId,
+                RequestId = payment.RequestId,
+                ReferenceNumber = payment.RepairRequest?.ReferenceNumber,
+                CustomerEmail = payment.RepairRequest?.Customer?.Email ?? "",
+                CustomerName = $"{payment.RepairRequest?.Customer?.FirstName} {payment.RepairRequest?.Customer?.LastName}".Trim(),
+                Device = payment.RepairRequest?.Device,
+                TotalAmount = payment.TotalAmount,
+                AdvancedPayment = payment.AdvancedPayment,
+                RemainingBalance = payment.TotalAmount - (payment.AdvancedPayment ?? 0),
+                PaymentDate = payment.PaymentDate,
+                IsPaid = payment.PaymentDate.HasValue,
+                RepairStatus = payment.RepairRequest?.Status.ToString() ?? "",
+                CreatedAt = payment.RepairRequest?.SubmittedAt
+            };
+        }
+
+        public async Task<Payment> CreatePaymentAsync(int repairId, CreatePaymentDto dto)
+        {
+            _logger.LogInformation($"Creating payment for repair ID: {repairId}.");
+
+            var repair = await _context.RepairRequests.FindAsync(repairId);
+            if (repair == null)
+            {
+                throw new KeyNotFoundException($"Repair with ID {repairId} not found.");
+            }
+
+            // Check if payment already exists for this repair
+            var existingPayment = await _context.Payments.FirstOrDefaultAsync(p => p.RequestId == repairId);
+            if (existingPayment != null)
+            {
+                throw new Exception($"Payment already exists for repair ID {repairId}.");
+            }
+
+            var payment = new Payment
+            {
+                RequestId = repairId,
+                TotalAmount = dto.TotalAmount,
+                AdvancedPayment = dto.AdvancedPayment,
+                PaymentDate = dto.PaymentDate
+            };
+
+            await _context.Payments.AddAsync(payment);
+            await _context.SaveChangesAsync();
+
+            return payment;
+        }
+
+        public async Task UpdatePaymentAsync(int paymentId, UpdatePaymentDto dto)
+        {
+            _logger.LogInformation($"Updating payment with ID: {paymentId}.");
+
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null)
+            {
+                throw new KeyNotFoundException($"Payment with ID {paymentId} not found.");
+            }
+
+            payment.TotalAmount = dto.TotalAmount;
+            payment.AdvancedPayment = dto.AdvancedPayment;
+            if (dto.PaymentDate.HasValue)
+            {
+                payment.PaymentDate = dto.PaymentDate;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task MarkPaymentAsPaidAsync(int paymentId, MarkPaymentPaidDto dto)
+        {
+            _logger.LogInformation($"Marking payment {paymentId} as paid.");
+
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null)
+            {
+                throw new KeyNotFoundException($"Payment with ID {paymentId} not found.");
+            }
+
+            payment.PaymentDate = dto.PaymentDate ?? DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeletePaymentAsync(int paymentId)
+        {
+            _logger.LogInformation($"Deleting payment with ID: {paymentId}.");
+
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null)
+            {
+                throw new KeyNotFoundException($"Payment with ID {paymentId} not found.");
+            }
+
+            _context.Payments.Remove(payment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<PaymentStatisticsDto> GetPaymentStatisticsAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            _logger.LogInformation("Fetching payment statistics.");
+
+            var query = _context.Payments.AsQueryable();
+
+            if (startDate.HasValue)
+                query = query.Where(p => p.PaymentDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(p => p.PaymentDate <= endDate.Value);
+
+            var allPayments = await query.ToListAsync();
+            var paidPayments = allPayments.Where(p => p.PaymentDate.HasValue).ToList();
+
+            var monthlyStats = paidPayments
+                .Where(p => p.PaymentDate.HasValue)
+                .GroupBy(p => new { p.PaymentDate!.Value.Year, p.PaymentDate!.Value.Month })
+                .Select(g => new MonthlyPaymentDto
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    MonthName = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM yyyy"),
+                    Revenue = g.Sum(p => p.TotalAmount),
+                    PaymentCount = g.Count()
+                })
+                .OrderBy(m => m.Year)
+                .ThenBy(m => m.Month)
+                .ToList();
+
+            return new PaymentStatisticsDto
+            {
+                TotalPayments = allPayments.Count,
+                PaidPayments = paidPayments.Count,
+                PendingPayments = allPayments.Count - paidPayments.Count,
+                TotalRevenue = paidPayments.Sum(p => p.TotalAmount),
+                PendingAmount = allPayments.Where(p => !p.PaymentDate.HasValue).Sum(p => p.TotalAmount),
+                AveragePaymentAmount = allPayments.Any() ? allPayments.Average(p => p.TotalAmount) : 0,
+                TotalAdvancedPayments = allPayments.Sum(p => p.AdvancedPayment ?? 0),
+                MonthlyPayments = monthlyStats
+            };
+        }
+
+        public async Task<IEnumerable<PaymentResponseDto>> GetPendingPaymentsAsync()
+        {
+            _logger.LogInformation("Fetching pending payments.");
+
+            var payments = await _context.Payments
+                .Where(p => p.PaymentDate == null)
+                .Include(p => p.RepairRequest)
+                    .ThenInclude(r => r.Customer!)
+                .ToListAsync();
+
+            return payments.Select(p => new PaymentResponseDto
+            {
+                PaymentId = p.PaymentId,
+                RequestId = p.RequestId,
+                ReferenceNumber = p.RepairRequest?.ReferenceNumber,
+                CustomerEmail = p.RepairRequest?.Customer?.Email ?? "",
+                CustomerName = $"{p.RepairRequest?.Customer?.FirstName} {p.RepairRequest?.Customer?.LastName}".Trim(),
+                Device = p.RepairRequest?.Device,
+                TotalAmount = p.TotalAmount,
+                AdvancedPayment = p.AdvancedPayment,
+                RemainingBalance = p.TotalAmount - (p.AdvancedPayment ?? 0),
+                PaymentDate = p.PaymentDate,
+                IsPaid = false,
+                RepairStatus = p.RepairRequest?.Status.ToString() ?? "",
+                CreatedAt = p.RepairRequest?.SubmittedAt
+            });
+        }
+
+        public async Task<IEnumerable<PaymentResponseDto>> GetCompletedPaymentsAsync()
+        {
+            _logger.LogInformation("Fetching completed payments.");
+
+            var payments = await _context.Payments
+                .Where(p => p.PaymentDate != null)
+                .Include(p => p.RepairRequest)
+                    .ThenInclude(r => r.Customer)
+                .ToListAsync();
+
+            return payments.Select(p => new PaymentResponseDto
+            {
+                PaymentId = p.PaymentId,
+                RequestId = p.RequestId,
+                ReferenceNumber = p.RepairRequest?.ReferenceNumber,
+                CustomerEmail = p.RepairRequest?.Customer?.Email ?? "",
+                CustomerName = $"{p.RepairRequest?.Customer?.FirstName} {p.RepairRequest?.Customer?.LastName}".Trim(),
+                Device = p.RepairRequest?.Device,
+                TotalAmount = p.TotalAmount,
+                AdvancedPayment = p.AdvancedPayment,
+                RemainingBalance = p.TotalAmount - (p.AdvancedPayment ?? 0),
+                PaymentDate = p.PaymentDate,
+                IsPaid = true,
+                RepairStatus = p.RepairRequest?.Status.ToString() ?? "",
+                CreatedAt = p.RepairRequest?.SubmittedAt
+            });
+        }
+        #endregion
+
+        public async Task<IEnumerable<RepairRequest>> GetAllRepairsAsync()
+        {
+            _logger.LogInformation("Fetching all repairs for admin.");
+            return await _context.RepairRequests
+                .Include(r => r.Customer)
+                .Include(r => r.Technician)
+                .Include(r => r.PaymentDetails)
+                .ToListAsync();
         }
         #endregion
     }
+
 }

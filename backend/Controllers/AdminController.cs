@@ -373,5 +373,181 @@ namespace backend.Controllers
             }
         }
         #endregion
+
+        #region Payment Management
+        [HttpGet("payments")]
+        public async Task<IActionResult> GetAllPayments([FromQuery] PaymentFilterDto? filter = null)
+        {
+            try
+            {
+                var payments = await _adminService.GetAllPaymentsAsync(filter);
+                return Ok(payments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all payments.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("payments/{paymentId}")]
+        public async Task<IActionResult> GetPaymentById(int paymentId)
+        {
+            try
+            {
+                var payment = await _adminService.GetPaymentByIdAsync(paymentId);
+                return Ok(payment);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching payment by ID.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("payments/repair/{repairId}")]
+        public async Task<IActionResult> GetPaymentByRepairId(int repairId)
+        {
+            try
+            {
+                var payment = await _adminService.GetPaymentByRepairIdAsync(repairId);
+                return Ok(payment);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching payment by repair ID.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("repairs/{repairId}/payment")]
+        public async Task<IActionResult> CreatePayment(int repairId, [FromBody] CreatePaymentDto dto)
+        {
+            try
+            {
+                var payment = await _adminService.CreatePaymentAsync(repairId, dto);
+                return CreatedAtAction(nameof(GetPaymentById), new { paymentId = payment.PaymentId }, payment);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating payment.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("payments/{paymentId}")]
+        public async Task<IActionResult> UpdatePayment(int paymentId, [FromBody] UpdatePaymentDto dto)
+        {
+            try
+            {
+                await _adminService.UpdatePaymentAsync(paymentId, dto);
+                return Ok(new { message = "Payment updated successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating payment.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("payments/{paymentId}/mark-paid")]
+        public async Task<IActionResult> MarkPaymentAsPaid(int paymentId, [FromBody] MarkPaymentPaidDto dto)
+        {
+            try
+            {
+                await _adminService.MarkPaymentAsPaidAsync(paymentId, dto);
+                return Ok(new { message = "Payment marked as paid successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while marking payment as paid.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("payments/{paymentId}")]
+        public async Task<IActionResult> DeletePayment(int paymentId)
+        {
+            try
+            {
+                await _adminService.DeletePaymentAsync(paymentId);
+                return Ok(new { message = "Payment deleted successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting payment.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("payments/statistics")]
+        public async Task<IActionResult> GetPaymentStatistics([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+        {
+            try
+            {
+                var statistics = await _adminService.GetPaymentStatisticsAsync(startDate, endDate);
+                return Ok(statistics);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching payment statistics.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("payments/pending")]
+        public async Task<IActionResult> GetPendingPayments()
+        {
+            try
+            {
+                var payments = await _adminService.GetPendingPaymentsAsync();
+                return Ok(payments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching pending payments.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("payments/completed")]
+        public async Task<IActionResult> GetCompletedPayments()
+        {
+            try
+            {
+                var payments = await _adminService.GetCompletedPaymentsAsync();
+                return Ok(payments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching completed payments.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        #endregion
     }
 }
