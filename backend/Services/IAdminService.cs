@@ -27,5 +27,18 @@ namespace backend.Services
 
         // Dashboard
         Task<AdminDashboardStatsDto> GetDashboardStatsAsync();
+
+        #region Payment Management
+        Task<IEnumerable<PaymentResponseDto>> GetAllPaymentsAsync(PaymentFilterDto? filter = null);
+        Task<PaymentResponseDto> GetPaymentByIdAsync(int paymentId);
+        Task<PaymentResponseDto> GetPaymentByRepairIdAsync(int repairId);
+        Task<Payment> CreatePaymentAsync(int repairId, CreatePaymentDto dto);
+        Task UpdatePaymentAsync(int paymentId, UpdatePaymentDto dto);
+        Task MarkPaymentAsPaidAsync(int paymentId, MarkPaymentPaidDto dto);
+        Task DeletePaymentAsync(int paymentId);
+        Task<PaymentStatisticsDto> GetPaymentStatisticsAsync(DateTime? startDate = null, DateTime? endDate = null);
+        Task<IEnumerable<PaymentResponseDto>> GetPendingPaymentsAsync();
+        Task<IEnumerable<PaymentResponseDto>> GetCompletedPaymentsAsync();
+        #endregion
     }
 }
