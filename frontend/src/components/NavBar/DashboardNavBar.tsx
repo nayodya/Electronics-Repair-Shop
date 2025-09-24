@@ -40,6 +40,7 @@ const DashboardNavBar: React.FC = () => {
             <Link to="/customer/add-repair" className="nav-link">New Order</Link>
             <Link to="/customer/repair-orders" className="nav-link">My Orders</Link>
             <Link to="/customer/edit-profile" className="nav-link">Profile</Link>
+            <Link to="/customer/repair-payments" className="nav-link">Payments</Link>
           </>
         );
       default:
