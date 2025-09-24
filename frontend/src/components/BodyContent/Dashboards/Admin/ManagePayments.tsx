@@ -1,295 +1,521 @@
-import { useState, useEffect } from "react";
-import api from "../../../../services/api";
+import React, { useState, useEffect } from 'react';
+import api from '../../../../services/api';
+import './ManagePayments.css';
 
 interface Payment {
   paymentId: number;
   requestId: number;
+  referenceNumber: string;
+  customerEmail: string;
+  customerName: string;
+  device: string;
   totalAmount: number;
-  advancedPayment: number | null;
-  paymentDate: string | null;
-  repairRequest: {
-    referenceNumber: string;
-    customer: {
-      firstName: string;
-      lastName: string;
-      email: string;
-    };
-    device: string;
-    brand: string;
-    status: number;
-  };
-}
-
-interface PaymentDto {
-  amount: number;
   advancedPayment?: number;
+  remainingBalance: number;
+  paymentDate?: string;
+  isPaid: boolean;
+  repairStatus: string;
+  createdAt: string;
 }
 
-const statusMap: Record<number, string> = {
-  0: "Received",
-  1: "In Progress", 
-  2: "Completed",
-  3: "Cancelled",
-  4: "Ready for Delivery",
-  5: "Delivered"
-};
+interface PaymentStatistics {
+  totalPayments: number;
+  paidPayments: number;
+  pendingPayments: number;
+  totalRevenue: number;
+  pendingAmount: number;
+  averagePaymentAmount: number;
+  totalAdvancedPayments: number;
+  monthlyPayments: Array<{
+    year: number;
+    month: number;
+    monthName: string;
+    revenue: number;
+    paymentCount: number;
+  }>;
+}
 
-const ManagePayments = () => {
+interface PaymentFilter {
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  isPaid?: boolean;
+  requestId?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+interface CreatePaymentForm {
+  totalAmount: number;
+  advancedPayment?: number;
+  paymentDate?: string;
+}
+
+interface UpdatePaymentForm {
+  totalAmount: number;
+  advancedPayment?: number;
+  paymentDate?: string;
+}
+
+const ManagePayments: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [repairs, setRepairs] = useState<any[]>([]);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [selectedRepair, setSelectedRepair] = useState<any>(null);
+  const [statistics, setStatistics] = useState<PaymentStatistics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-
-  const [paymentData, setPaymentData] = useState<PaymentDto>({
-    amount: 0,
-    advancedPayment: 0
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'completed' | 'statistics'>('all');
+  const [filter, setFilter] = useState<PaymentFilter>({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedRepairId, setSelectedRepairId] = useState<number | null>(null);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
+  const [createForm, setCreateForm] = useState<CreatePaymentForm>({
+    totalAmount: 0
+  });
+  const [updateForm, setUpdateForm] = useState<UpdatePaymentForm>({
+    totalAmount: 0
   });
 
   useEffect(() => {
     fetchPayments();
-    fetchRepairs();
-  }, []);
+    fetchStatistics();
+  }, [activeTab, filter]);
 
   const fetchPayments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.get("/Admin/repairs", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      // Filter repairs that have payment details
-      const paymentsData = response.data
-        .filter((repair: any) => repair.paymentDetails)
-        .map((repair: any) => ({
-          paymentId: repair.paymentDetails.paymentId,
-          requestId: repair.requestId,
-          totalAmount: repair.paymentDetails.totalAmount,
-          advancedPayment: repair.paymentDetails.advancedPayment,
-          paymentDate: repair.paymentDetails.paymentDate,
-          repairRequest: repair
-        }));
-      
-      setPayments(paymentsData);
-    } catch (err: any) {
-      setError("Failed to fetch payments");
-    }
-  };
-
-  const fetchRepairs = async () => {
-    try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await api.get("/Admin/repairs", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setRepairs(response.data);
+      let url = '/admin/payments';
+      
+      if (activeTab === 'pending') {
+        url = '/admin/payments/pending';
+      } else if (activeTab === 'completed') {
+        url = '/admin/payments/completed';
+      }
+
+      // Add filter parameters
+      const params = new URLSearchParams();
+      if (filter.startDate) params.append('startDate', filter.startDate);
+      if (filter.endDate) params.append('endDate', filter.endDate);
+      if (filter.minAmount) params.append('minAmount', filter.minAmount.toString());
+      if (filter.maxAmount) params.append('maxAmount', filter.maxAmount.toString());
+      if (filter.isPaid !== undefined) params.append('isPaid', filter.isPaid.toString());
+      if (filter.requestId) params.append('requestId', filter.requestId.toString());
+      if (filter.sortBy) params.append('sortBy', filter.sortBy);
+      if (filter.sortOrder) params.append('sortOrder', filter.sortOrder);
+      if (filter.pageNumber) params.append('pageNumber', filter.pageNumber.toString());
+      if (filter.pageSize) params.append('pageSize', filter.pageSize.toString());
+
+      if (params.toString() && activeTab === 'all') {
+        url += `?${params.toString()}`;
+      }
+
+      const response = await api.get(url);
+      setPayments(response.data);
+      setError(null);
     } catch (err: any) {
-      setError("Failed to fetch repairs");
+      setError(err.response?.data?.message || 'Failed to fetch payments');
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchStatistics = async () => {
+    try {
+      const response = await api.get('/admin/payments/statistics');
+      setStatistics(response.data);
+    } catch (err: any) {
+      console.error('Failed to fetch statistics:', err);
+    }
+  };
+
+  const handleCreatePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRepairId) return;
+
+    try {
+      await api.post(`/admin/repairs/${selectedRepairId}/payment`, createForm);
+      setShowCreateModal(false);
+      setCreateForm({ totalAmount: 0 });
+      setSelectedRepairId(null);
+      fetchPayments();
+      alert('Payment created successfully!');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to create payment');
+    }
+  };
+
   const handleUpdatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRepair) return;
+    if (!selectedPaymentId) return;
 
     try {
-      const token = localStorage.getItem("token");
-      await api.put(`/Admin/repairs/${selectedRepair.requestId}/payment`, paymentData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessage("Payment updated successfully!");
-      setShowPaymentForm(false);
-      setSelectedRepair(null);
+      await api.put(`/admin/payments/${selectedPaymentId}`, updateForm);
+      setShowUpdateModal(false);
+      setUpdateForm({ totalAmount: 0 });
+      setSelectedPaymentId(null);
       fetchPayments();
-      fetchRepairs();
+      alert('Payment updated successfully!');
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update payment");
+      alert(err.response?.data?.message || 'Failed to update payment');
     }
   };
 
-  const handleMarkReadyForDelivery = async (requestId: number) => {
+  const handleMarkAsPaid = async (paymentId: number) => {
+    if (!confirm('Mark this payment as paid?')) return;
+
     try {
-      const token = localStorage.getItem("token");
-      await api.put(`/Admin/repairs/${requestId}/ready-for-delivery`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
+      await api.put(`/admin/payments/${paymentId}/mark-paid`, {
+        paymentDate: new Date().toISOString()
       });
-      setMessage("Repair marked as ready for delivery!");
       fetchPayments();
-      fetchRepairs();
+      alert('Payment marked as paid successfully!');
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to mark as ready for delivery");
+      alert(err.response?.data?.message || 'Failed to mark payment as paid');
     }
   };
 
-  const openPaymentForm = (repair: any) => {
-    setSelectedRepair(repair);
-    setPaymentData({
-      amount: repair.paymentDetails?.totalAmount || 0,
-      advancedPayment: repair.paymentDetails?.advancedPayment || 0
+  const handleDeletePayment = async (paymentId: number) => {
+    if (!confirm('Are you sure you want to delete this payment?')) return;
+
+    try {
+      await api.delete(`/admin/payments/${paymentId}`);
+      fetchPayments();
+      alert('Payment deleted successfully!');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete payment');
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not paid';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const openCreateModal = (repairId: number) => {
+    setSelectedRepairId(repairId);
+    setShowCreateModal(true);
+  };
+
+  const openUpdateModal = (payment: Payment) => {
+    setSelectedPaymentId(payment.paymentId);
+    setUpdateForm({
+      totalAmount: payment.totalAmount,
+      advancedPayment: payment.advancedPayment || undefined,
+      paymentDate: payment.paymentDate || undefined
     });
-    setShowPaymentForm(true);
+    setShowUpdateModal(true);
   };
 
-  if (loading) return <div className="admin-loading">Loading payments...</div>;
+  const renderStatistics = () => {
+    if (!statistics) return <div>Loading statistics...</div>;
+
+    return (
+      <div className="statistics-container">
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Payments</h3>
+            <p className="stat-number">{statistics.totalPayments}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Paid Payments</h3>
+            <p className="stat-number success">{statistics.paidPayments}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Pending Payments</h3>
+            <p className="stat-number warning">{statistics.pendingPayments}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Total Revenue</h3>
+            <p className="stat-number">{formatCurrency(statistics.totalRevenue)}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Pending Amount</h3>
+            <p className="stat-number warning">{formatCurrency(statistics.pendingAmount)}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Average Payment</h3>
+            <p className="stat-number">{formatCurrency(statistics.averagePaymentAmount)}</p>
+          </div>
+        </div>
+
+        <div className="monthly-stats">
+          <h3>Monthly Revenue</h3>
+          <div className="monthly-grid">
+            {statistics.monthlyPayments.map((month, index) => (
+              <div key={index} className="monthly-card">
+                <h4>{month.monthName}</h4>
+                <p>Revenue: {formatCurrency(month.revenue)}</p>
+                <p>Payments: {month.paymentCount}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderFilters = () => (
+    <div className="filters-container">
+      <div className="filter-row">
+        <input
+          type="date"
+          placeholder="Start Date"
+          value={filter.startDate || ''}
+          onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+        />
+        <input
+          type="date"
+          placeholder="End Date"
+          value={filter.endDate || ''}
+          onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Min Amount"
+          value={filter.minAmount || ''}
+          onChange={(e) => setFilter({ ...filter, minAmount: parseFloat(e.target.value) || undefined })}
+        />
+        <input
+          type="number"
+          placeholder="Max Amount"
+          value={filter.maxAmount || ''}
+          onChange={(e) => setFilter({ ...filter, maxAmount: parseFloat(e.target.value) || undefined })}
+        />
+        <select
+          value={filter.isPaid === undefined ? '' : filter.isPaid.toString()}
+          onChange={(e) => setFilter({ ...filter, isPaid: e.target.value === '' ? undefined : e.target.value === 'true' })}
+        >
+          <option value="">All Payments</option>
+          <option value="true">Paid Only</option>
+          <option value="false">Unpaid Only</option>
+        </select>
+        <button onClick={() => setFilter({})}>Clear Filters</button>
+      </div>
+    </div>
+  );
+
+  const renderPaymentsTable = () => (
+    <div className="table-container">
+      <table className="payments-table">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Reference</th>
+            <th>Customer</th>
+            <th>Device</th>
+            <th>Total Amount</th>
+            <th>Advanced Payment</th>
+            <th>Remaining</th>
+            <th>Status</th>
+            <th>Payment Date</th>
+            <th>Repair Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {payments.map((payment) => (
+            <tr key={payment.paymentId}>
+              <td>{payment.paymentId}</td>
+              <td>{payment.referenceNumber}</td>
+              <td>
+                <div>
+                  <div>{payment.customerName}</div>
+                  <small>{payment.customerEmail}</small>
+                </div>
+              </td>
+              <td>{payment.device}</td>
+              <td>{formatCurrency(payment.totalAmount)}</td>
+              <td>{payment.advancedPayment ? formatCurrency(payment.advancedPayment) : '-'}</td>
+              <td>{formatCurrency(payment.remainingBalance)}</td>
+              <td>
+                <span className={`status-badge ${payment.isPaid ? 'paid' : 'unpaid'}`}>
+                  {payment.isPaid ? 'Paid' : 'Unpaid'}
+                </span>
+              </td>
+              <td>{formatDate(payment.paymentDate)}</td>
+              <td>
+                <span className={`status-badge ${payment.repairStatus.toLowerCase()}`}>
+                  {payment.repairStatus}
+                </span>
+              </td>
+              <td>
+                <div className="actions">
+                  <button
+                    className="btn-edit"
+                    onClick={() => openUpdateModal(payment)}
+                  >
+                    Edit
+                  </button>
+                  {!payment.isPaid && (
+                    <button
+                      className="btn-success"
+                      onClick={() => handleMarkAsPaid(payment.paymentId)}
+                    >
+                      Mark Paid
+                    </button>
+                  )}
+                  <button
+                    className="btn-delete"
+                    onClick={() => handleDeletePayment(payment.paymentId)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  if (loading) return <div className="loading">Loading payments...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="admin-page">
-      <div className="page-header">
+    <div className="manage-payments">
+      <div className="header">
         <h1>Manage Payments</h1>
+        <button
+          className="btn-primary"
+          onClick={() => {
+            const repairId = prompt('Enter Repair ID to create payment for:');
+            if (repairId) openCreateModal(parseInt(repairId));
+          }}
+        >
+          Create Payment
+        </button>
       </div>
 
-      {error && <div className="admin-error">{error}</div>}
-      {message && <div className="admin-success">{message}</div>}
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+          onClick={() => setActiveTab('all')}
+        >
+          All Payments
+        </button>
+        <button
+          className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
+          onClick={() => setActiveTab('pending')}
+        >
+          Pending Payments
+        </button>
+        <button
+          className={`tab ${activeTab === 'completed' ? 'active' : ''}`}
+          onClick={() => setActiveTab('completed')}
+        >
+          Completed Payments
+        </button>
+        <button
+          className={`tab ${activeTab === 'statistics' ? 'active' : ''}`}
+          onClick={() => setActiveTab('statistics')}
+        >
+          Statistics
+        </button>
+      </div>
 
-      {showPaymentForm && selectedRepair && (
+      {activeTab !== 'statistics' && renderFilters()}
+
+      {activeTab === 'statistics' ? renderStatistics() : renderPaymentsTable()}
+
+      {/* Create Payment Modal */}
+      {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>Update Payment - {selectedRepair.referenceNumber}</h2>
-              <button 
-                className="close-btn"
-                onClick={() => setShowPaymentForm(false)}
-              >
-                ✕
-              </button>
+              <h2>Create Payment</h2>
+              <button onClick={() => setShowCreateModal(false)}>×</button>
             </div>
-            <form onSubmit={handleUpdatePayment}>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Total Amount</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={paymentData.amount}
-                    onChange={(e) => setPaymentData({...paymentData, amount: Number(e.target.value)})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Advanced Payment</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={paymentData.advancedPayment || 0}
-                    onChange={(e) => setPaymentData({...paymentData, advancedPayment: Number(e.target.value)})}
-                  />
-                </div>
+            <form onSubmit={handleCreatePayment}>
+              <div className="form-group">
+                <label>Total Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  value={createForm.totalAmount}
+                  onChange={(e) => setCreateForm({ ...createForm, totalAmount: parseFloat(e.target.value) })}
+                />
               </div>
-              <div className="form-actions">
-                <button type="submit" className="primary-btn">
-                  Update Payment
-                </button>
-                <button 
-                  type="button" 
-                  className="secondary-btn"
-                  onClick={() => setShowPaymentForm(false)}
-                >
-                  Cancel
-                </button>
+              <div className="form-group">
+                <label>Advanced Payment (Optional)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={createForm.advancedPayment || ''}
+                  onChange={(e) => setCreateForm({ ...createForm, advancedPayment: parseFloat(e.target.value) || undefined })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Payment Date (Optional)</label>
+                <input
+                  type="datetime-local"
+                  value={createForm.paymentDate || ''}
+                  onChange={(e) => setCreateForm({ ...createForm, paymentDate: e.target.value || undefined })}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit">Create Payment</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <div className="payments-section">
-        <h2>Payment Records</h2>
-        <div className="data-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Customer</th>
-                <th>Device</th>
-                <th>Total Amount</th>
-                <th>Advanced Payment</th>
-                <th>Payment Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((payment) => (
-                <tr key={payment.paymentId}>
-                  <td>{payment.repairRequest.referenceNumber}</td>
-                  <td>{`${payment.repairRequest.customer?.firstName || ""} ${payment.repairRequest.customer?.lastName || ""}`.trim()}</td>
-                  <td>{`${payment.repairRequest.brand} ${payment.repairRequest.device}`}</td>
-                  <td>${payment.totalAmount.toFixed(2)}</td>
-                  <td>${(payment.advancedPayment || 0).toFixed(2)}</td>
-                  <td>{payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : "Pending"}</td>
-                  <td>
-                    <span className={`status-badge status-${statusMap[payment.repairRequest.status]?.toLowerCase().replace(" ", "-")}`}>
-                      {statusMap[payment.repairRequest.status]}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button 
-                        className="edit-btn"
-                        onClick={() => openPaymentForm(payment.repairRequest)}
-                      >
-                        Update
-                      </button>
-                      {payment.repairRequest.status === 2 && payment.paymentDate && (
-                        <button 
-                          className="primary-btn"
-                          onClick={() => handleMarkReadyForDelivery(payment.requestId)}
-                        >
-                          Ready for Delivery
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Update Payment Modal */}
+      {showUpdateModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>Update Payment</h2>
+              <button onClick={() => setShowUpdateModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleUpdatePayment}>
+              <div className="form-group">
+                <label>Total Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  value={updateForm.totalAmount}
+                  onChange={(e) => setUpdateForm({ ...updateForm, totalAmount: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Advanced Payment (Optional)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={updateForm.advancedPayment || ''}
+                  onChange={(e) => setUpdateForm({ ...updateForm, advancedPayment: parseFloat(e.target.value) || undefined })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Payment Date (Optional)</label>
+                <input
+                  type="datetime-local"
+                  value={updateForm.paymentDate || ''}
+                  onChange={(e) => setUpdateForm({ ...updateForm, paymentDate: e.target.value || undefined })}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowUpdateModal(false)}>Cancel</button>
+                <button type="submit">Update Payment</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-
-      <div className="unpaid-repairs-section">
-        <h2>Repairs Without Payment</h2>
-        <div className="data-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Customer</th>
-                <th>Device</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {repairs.filter(repair => !repair.paymentDetails).map((repair) => (
-                <tr key={repair.requestId}>
-                  <td>{repair.referenceNumber}</td>
-                  <td>{`${repair.customer?.firstName || ""} ${repair.customer?.lastName || ""}`.trim()}</td>
-                  <td>{`${repair.brand} ${repair.device}`}</td>
-                  <td>
-                    <span className={`status-badge status-${statusMap[repair.status]?.toLowerCase().replace(" ", "-")}`}>
-                      {statusMap[repair.status]}
-                    </span>
-                  </td>
-                  <td>
-                    <button 
-                      className="primary-btn"
-                      onClick={() => openPaymentForm(repair)}
-                    >
-                      Add Payment
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
