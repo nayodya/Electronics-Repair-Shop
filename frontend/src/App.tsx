@@ -23,7 +23,7 @@ import AdminDashboard from "./components/BodyContent/Dashboards/Admin/AdminDashb
 import PublicLayout from "./components/layouts/PublicLayout";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import ManageRequests from "./components/BodyContent/Dashboards/Admin/ManageRequests";
-import ManageTechnicians from "./components/BodyContent/Dashboards/Admin/ManageTechnicians";
+
 import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
 import CustomerDetails from "./components/BodyContent/Dashboards/Customer/Proofile";
 import RepairingStatus from "./components/BodyContent/Dashboards/Technician/RepairingStatus";
@@ -67,8 +67,6 @@ function App() {
         }>
           <Route path="dashboard" element={<TechnicianDashboard />} />
           <Route path="repairs" element={<div><RepairingStatus/></div>} />
-          <Route path="schedule" element={<div>Technician Schedule</div>} />
-          <Route path="profile" element={<div>Technician Profile</div>} />
         </Route>
 
         {/* Protected Admin Routes with Dashboard Layout */}
@@ -78,9 +76,7 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="dashboard/requests" element={<div>{<ManageRequests/>}</div>} />
-          <Route path="dashboard/technicians" element={<div>{<ManageTechnicians/>}</div>} />
-          <Route path="dashboard/users" element={<div>{<ManageUsers/>}</div>} />
+          <Route path="dashboard/requests" element={<div>{<ManageRequests/>}</div>} />          <Route path="dashboard/users" element={<div>{<ManageUsers/>}</div>} />
           <Route path="dashboard/payments" element={<div>{<ManagePayments/>}</div>} />
         </Route>
 

@@ -1,81 +1,175 @@
-// src/pages/CustomerDashboard.tsx
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../../context/AuthContext";
-import api from "../../../../services/api";
-import "./TechnicianDashboard.css";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../../../../services/api';
+import './TechnicianDashboard.css';
 
-interface RepairOrder {
+interface RepairRequest {
   requestId: number;
   referenceNumber: string;
   device: string;
   brand: string;
   model: string;
   issue: string;
-  status: number;
+  description?: string;
+  status: RepairStatus;
   submittedAt: string;
-  customerName?: string;
+  estimatedCompletionDays?: number;
+  customer: {
+    userId: number;
+    name: string;
+    email: string;
+    phone: string;
+  };
 }
 
-const statusMap: Record<number, string> = {
-  0: "Received",
-  1: "In Progress",
-  2: "Completed",
-  3: "Cancelled",
-};
+const RepairStatus = {
+  Received: 0,
+  InProgress: 1,
+  Completed: 2,
+  Cancelled: 3,
+  ReadyForDelivery: 4,
+  Delivered: 5
+} as const;
+type RepairStatus = typeof RepairStatus[keyof typeof RepairStatus];
 
-const TechnicianDashboard = () => {
-  const [orders, setOrders] = useState<RepairOrder[]>([]);
+interface TechnicianStatistics {
+  totalAssigned: number;
+  inProgress: number;
+  completed: number;
+  readyForDelivery: number;
+  delivered: number;
+  cancelled: number;
+}
+
+const TechnicianDashboard: React.FC = () => {
+  const [repairs, setRepairs] = useState<RepairRequest[]>([]);
+  const [statistics, setStatistics] = useState<TechnicianStatistics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        const res = await api.get("/Repair/assigned", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setOrders(res.data);
-      } catch (err: any) {
-        setError("Failed to load assigned repairs.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
+    fetchAssignedRepairs();
   }, []);
 
+  const fetchAssignedRepairs = async () => {
+    try {
+      setLoading(true);
+      
+      console.log('Fetching assigned repairs...');
+      
+      const response = await api.get('/technician/assigned-repairs');
+      
+      console.log('Response received:', response.data);
+      
+      // Check if response.data is actually an array
+      if (Array.isArray(response.data)) {
+        setRepairs(response.data);
+        calculateStatistics(response.data);
+      } else {
+        console.error('Response data is not an array:', response.data);
+        setRepairs([]);
+        calculateStatistics([]);
+      }
+      
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching repairs:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      
+      let errorMessage = 'Failed to fetch repairs';
+      
+      // Check if we got HTML instead of JSON (means wrong endpoint)
+      if (typeof err.response?.data === 'string' && err.response.data.includes('<!doctype html>')) {
+        errorMessage = 'API endpoint not found - check if backend is running on port 5062';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Unauthorized - Please login again';
+      } else if (err.response?.status === 403) {
+        errorMessage = 'Access denied - Technician role required';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      setRepairs([]);
+      setStatistics(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStatistics = (repairData: RepairRequest[]) => {
+    // Ensure repairData is an array
+    if (!Array.isArray(repairData)) {
+      console.warn('calculateStatistics called with non-array data:', repairData);
+      repairData = [];
+    }
+    
+    const stats: TechnicianStatistics = {
+      totalAssigned: repairData.length,
+      inProgress: repairData.filter(r => r.status === RepairStatus.InProgress).length,
+      completed: repairData.filter(r => r.status === RepairStatus.Completed).length,
+      readyForDelivery: repairData.filter(r => r.status === RepairStatus.ReadyForDelivery).length,
+      delivered: repairData.filter(r => r.status === RepairStatus.Delivered).length,
+      cancelled: repairData.filter(r => r.status === RepairStatus.Cancelled).length,
+    };
+    setStatistics(stats);
+  };
+
+  const handleViewAssignedRepairs = () => {
+    navigate('/repairing-status');
+  };
+
+  if (loading) return <div className="loading">Loading...</div>;
+  
+  if (error) {
+    return (
+      <div className="error-container">
+        <div className="error">Error: {error}</div>
+        <button onClick={fetchAssignedRepairs} className="retry-btn">
+          Retry
+        </button>
+        <div className="debug-info">
+          <p><small>Debug: Make sure your backend is running on http://localhost:5062</small></p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="tech-dashboard-container">
-      <h2 className="tech-dashboard-section-title">Assigned Repair Orders</h2>
-      {loading ? (
-        <div className="tech-dashboard-message">Loading...</div>
-      ) : error ? (
-        <div className="tech-dashboard-error">{error}</div>
-      ) : orders.length === 0 ? (
-        <div className="tech-dashboard-message">No assigned repair orders.</div>
-      ) : (
-        <div className="tech-orders-list">
-          {orders.map((order) => (
-            <div className="tech-order-card" key={order.requestId}>
-              <div className="tech-order-header">
-                <span className="tech-order-ref">#{order.referenceNumber}</span>
-                <span className={`tech-order-status status-${statusMap[order.status]?.toLowerCase().replace(" ", "-")}`}>
-                  {statusMap[order.status] || "Unknown"}
-                </span>
-              </div>
-              <div className="tech-order-details">
-                <div><strong>Device:</strong> {order.brand} {order.model} ({order.device})</div>
-                <div><strong>Issue:</strong> {order.issue}</div>
-                <div><strong>Submitted:</strong> {new Date(order.submittedAt).toLocaleString()}</div>
-                {order.customerName && (
-                  <div><strong>Customer:</strong> {order.customerName}</div>
-                )}
-              </div>
-              {/* You can add action buttons here, e.g. "Update Status" */}
-            </div>
-          ))}
+    <div className="technician-dashboard">
+      <h1>Technician Dashboard</h1>
+
+      {/* Statistics Cards */}
+      {statistics && (
+        <div className="statistics-grid">
+          <div className="stat-card">
+            <h3>Total Assigned</h3>
+            <p className="stat-number">{statistics.totalAssigned}</p>
+          </div>
+          <div className="stat-card">
+            <h3>In Progress</h3>
+            <p className="stat-number">{statistics.inProgress}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Completed</h3>
+            <p className="stat-number">{statistics.completed}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Ready for Delivery</h3>
+            <p className="stat-number">{statistics.readyForDelivery}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Delivered</h3>
+            <p className="stat-number">{statistics.delivered}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Cancelled</h3>
+            <p className="stat-number">{statistics.cancelled}</p>
+          </div>
         </div>
       )}
     </div>
