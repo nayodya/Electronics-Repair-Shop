@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../../services/api";
-
+import "./ManageRequests.css";
 
 interface RepairRequest {
   requestId: number;
@@ -33,6 +33,10 @@ interface PaymentDto {
   advancedPayment?: number;
 }
 
+interface EstimatedDaysDto {
+  estimatedCompletionDays: number;
+}
+
 const ManageRequests: React.FC = () => {
   const [requests, setRequests] = useState<RepairRequest[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
@@ -50,6 +54,13 @@ const ManageRequests: React.FC = () => {
   });
   const [selectedPaymentRequest, setSelectedPaymentRequest] = useState<RepairRequest | null>(null);
 
+  // Estimated days form state
+  const [showEstimatedDaysForm, setShowEstimatedDaysForm] = useState(false);
+  const [estimatedDaysData, setEstimatedDaysData] = useState<EstimatedDaysDto>({
+    estimatedCompletionDays: 0
+  });
+  const [selectedEstimatedDaysRequest, setSelectedEstimatedDaysRequest] = useState<RepairRequest | null>(null);
+
   useEffect(() => {
     fetchRequests();
     fetchTechnicians();
@@ -66,14 +77,12 @@ const ManageRequests: React.FC = () => {
         return;
       }
 
-      // Use the correct endpoint without /debug
       const res = await api.get("/Admin/repairs/debug", {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       console.log("API Response:", res.data);
       
-      // Handle the API response structure {count, data}
       let requestsData = [];
       if (res.data && res.data.data && Array.isArray(res.data.data)) {
         requestsData = res.data.data;
@@ -85,7 +94,6 @@ const ManageRequests: React.FC = () => {
         return;
       }
       
-      // Validate each request item
       const validatedRequests = requestsData.filter((item: any) => {
         return item && typeof item === 'object' && item.requestId;
       });
@@ -111,7 +119,6 @@ const ManageRequests: React.FC = () => {
         return;
       }
 
-      // Use the correct endpoint
       const res = await api.get("/Admin/technicians", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -121,7 +128,6 @@ const ManageRequests: React.FC = () => {
       
     } catch (err: any) {
       console.error("Failed to fetch technicians:", err);
-      // Don't show error for technicians - it's not critical
     }
   };
 
@@ -141,7 +147,6 @@ const ManageRequests: React.FC = () => {
       setMessage("✅ Technician assigned successfully!");
       await fetchRequests();
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
       
     } catch (err: any) {
@@ -167,7 +172,6 @@ const ManageRequests: React.FC = () => {
       setMessage("✅ Status updated successfully!");
       await fetchRequests();
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
       
     } catch (err: any) {
@@ -187,7 +191,6 @@ const ManageRequests: React.FC = () => {
       setError("");
       const token = localStorage.getItem("token");
       
-      // Remove /debug from the endpoint
       await api.delete(`/Admin/repairs/debug/${requestId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -195,7 +198,6 @@ const ManageRequests: React.FC = () => {
       setMessage("✅ Repair request deleted successfully!");
       await fetchRequests();
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
       
     } catch (err: any) {
@@ -243,12 +245,58 @@ const ManageRequests: React.FC = () => {
       setSelectedPaymentRequest(null);
       await fetchRequests();
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
       
     } catch (err: any) {
       console.error("Failed to update payment:", err);
       const errorMessage = err.response?.data?.message || err.message || "Failed to update payment";
+      setError(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Estimated days functions
+  const openEstimatedDaysForm = (request: RepairRequest) => {
+    setSelectedEstimatedDaysRequest(request);
+    setEstimatedDaysData({
+      estimatedCompletionDays: request.estimatedCompletionDays || 0
+    });
+    setShowEstimatedDaysForm(true);
+    setError("");
+  };
+
+  const closeEstimatedDaysForm = () => {
+    setShowEstimatedDaysForm(false);
+    setSelectedEstimatedDaysRequest(null);
+    setEstimatedDaysData({ estimatedCompletionDays: 0 });
+    setError("");
+  };
+
+  const handleUpdateEstimatedDays = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEstimatedDaysRequest) return;
+
+    try {
+      setLoading(true);
+      setError("");
+      const token = localStorage.getItem("token");
+      
+      await api.put(`/Repair/${selectedEstimatedDaysRequest.requestId}/estimated-days`, estimatedDaysData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      setMessage("✅ Estimated completion days updated successfully!");
+      setShowEstimatedDaysForm(false);
+      setSelectedEstimatedDaysRequest(null);
+      await fetchRequests();
+      
+      setTimeout(() => setMessage(""), 3000);
+      
+    } catch (err: any) {
+      console.error("Failed to update estimated days:", err);
+      const errorMessage = err.response?.data?.message || err.message || "Failed to update estimated days";
       setError(errorMessage);
       setMessage(`❌ ${errorMessage}`);
     } finally {
@@ -280,14 +328,12 @@ const ManageRequests: React.FC = () => {
     return statusClassMap[status] || "unknown";
   };
 
-  // Safe filtering with proper null checks
   const filteredRequests = requests.filter(req => {
     if (!req || typeof req !== 'object') return false;
     return filterStatus === "all" || req.status?.toString() === filterStatus;
   });
 
-  // Error boundary fallback
-  if (error && !loading && !showPaymentForm) {
+  if (error && !loading && !showPaymentForm && !showEstimatedDaysForm) {
     return (
       <div className="admin-container">
         <div className="admin-error">
@@ -373,6 +419,7 @@ const ManageRequests: React.FC = () => {
                 <th>Status</th>
                 <th>Payment</th>
                 <th>Technician</th>
+                <th>Est. Days</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
@@ -455,6 +502,34 @@ const ManageRequests: React.FC = () => {
                       </select>
                     )}
                   </td>
+                  <td>
+                    <div className="estimated-days-cell">
+                      {request.estimatedCompletionDays ? (
+                        <div className="estimated-days-info">
+                          <span className="days-badge">
+                            📅 {request.estimatedCompletionDays} days
+                          </span>
+                          <button 
+                            className="admin-btn admin-btn-info admin-btn-small"
+                            onClick={() => openEstimatedDaysForm(request)}
+                            disabled={loading}
+                            title="Update estimated days"
+                          >
+                            ✏️ Edit
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          className="admin-btn admin-btn-secondary admin-btn-small"
+                          onClick={() => openEstimatedDaysForm(request)}
+                          disabled={loading}
+                          title="Set estimated days"
+                        >
+                          📅 Set Days
+                        </button>
+                      )}
+                    </div>
+                  </td>
                   <td className="date-cell">
                     {request.submittedAt ? new Date(request.submittedAt).toLocaleDateString() : 'N/A'}
                   </td>
@@ -498,6 +573,117 @@ const ManageRequests: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Estimated Days Form Modal */}
+      {showEstimatedDaysForm && selectedEstimatedDaysRequest && (
+        <div className="admin-modal-overlay" onClick={closeEstimatedDaysForm}>
+          <div className="admin-modal estimated-days-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <h3>
+                📅 {selectedEstimatedDaysRequest.estimatedCompletionDays ? 'Update' : 'Set'} Estimated Days - {selectedEstimatedDaysRequest.referenceNumber}
+              </h3>
+              <button 
+                className="admin-modal-close"
+                onClick={closeEstimatedDaysForm}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="admin-modal-content">
+              {error && (
+                <div className="payment-error">
+                  ⚠️ {error}
+                </div>
+              )}
+              
+              <div className="payment-request-info">
+                <h4>🔧 Request Information</h4>
+                <div className="request-info-grid">
+                  <div>
+                    <strong>Customer:</strong> {selectedEstimatedDaysRequest.customerEmail}
+                  </div>
+                  <div>
+                    <strong>Device:</strong> {selectedEstimatedDaysRequest.brand} {selectedEstimatedDaysRequest.model}
+                  </div>
+                  <div>
+                    <strong>Issue:</strong> {selectedEstimatedDaysRequest.issue}
+                  </div>
+                  <div>
+                    <strong>Status:</strong> 
+                    <span className={`status-badge status-${getStatusClass(selectedEstimatedDaysRequest.status)}`}>
+                      {getStatusText(selectedEstimatedDaysRequest.status)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdateEstimatedDays} className="payment-form">
+                <div className="payment-form-grid">
+                  <div className="payment-form-group">
+                    <label>
+                      <span>📅</span>
+                      Estimated Completion Days *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={estimatedDaysData.estimatedCompletionDays}
+                      onChange={(e) => setEstimatedDaysData({estimatedCompletionDays: Number(e.target.value)})}
+                      placeholder="Enter days (1-365)"
+                      required
+                    />
+                    <small style={{ color: '#666', fontSize: '12px', marginTop: '4px' }}>
+                      Enter the estimated number of days to complete this repair (1-365 days)
+                    </small>
+                  </div>
+                </div>
+
+                <div className="payment-summary">
+                  <h4>📊 Completion Summary</h4>
+                  <div className="summary-grid">
+                    <div className="summary-item">
+                      <span>Current Estimated Days:</span>
+                      <strong>{selectedEstimatedDaysRequest.estimatedCompletionDays || 'Not set'}</strong>
+                    </div>
+                    <div className="summary-item">
+                      <span>New Estimated Days:</span>
+                      <strong>{estimatedDaysData.estimatedCompletionDays} days</strong>
+                    </div>
+                    {estimatedDaysData.estimatedCompletionDays > 0 && (
+                      <div className="summary-item summary-remaining">
+                        <span>Expected Completion:</span>
+                        <strong>
+                          {new Date(Date.now() + estimatedDaysData.estimatedCompletionDays * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="payment-form-actions">
+                  <button 
+                    type="submit" 
+                    className="admin-btn admin-btn-primary"
+                    disabled={loading || estimatedDaysData.estimatedCompletionDays <= 0}
+                  >
+                    {loading ? "⏳ Processing..." : selectedEstimatedDaysRequest.estimatedCompletionDays ? "📅 Update Days" : "📅 Set Days"}
+                  </button>
+                  <button 
+                    type="button" 
+                    className="admin-btn admin-btn-secondary"
+                    onClick={closeEstimatedDaysForm}
+                    disabled={loading}
+                  >
+                    ❌ Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       )}
 
@@ -664,10 +850,24 @@ const ManageRequests: React.FC = () => {
                       ? new Date(selectedRequest.submittedAt).toLocaleString()
                       : 'Not available'
                   }</p>
-                  <p><strong>Estimated Days:</strong> {selectedRequest.estimatedCompletionDays || 'Not specified'}</p>
+                  <p><strong>Estimated Days:</strong> {
+                    selectedRequest.estimatedCompletionDays 
+                      ? `${selectedRequest.estimatedCompletionDays} days`
+                      : 'Not specified'
+                  }</p>
                   <p><strong>Technician:</strong> {
                     selectedRequest.technicianEmail || "Not assigned"
                   }</p>
+                  <button 
+                    className="admin-btn admin-btn-secondary admin-btn-small"
+                    onClick={() => {
+                      setSelectedRequest(null);
+                      openEstimatedDaysForm(selectedRequest);
+                    }}
+                    style={{ marginTop: '0.5rem', marginRight: '0.5rem' }}
+                  >
+                    {selectedRequest.estimatedCompletionDays ? '📅 Edit Days' : '📅 Set Days'}
+                  </button>
                 </div>
 
                 <div className="admin-detail-section">

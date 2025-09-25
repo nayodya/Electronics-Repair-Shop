@@ -19,7 +19,6 @@ const DashboardNavBar: React.FC = () => {
             <Link to="/admin/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/admin/dashboard/requests" className="nav-link">Repairs</Link>
             <Link to="/admin/dashboard/users" className="nav-link">Users</Link>
-            <Link to="/admin/dashboard/technicians" className="nav-link">Technicians</Link>
             <Link to="/admin/dashboard/payments" className="nav-link">Payments</Link>
 
           </>
@@ -29,8 +28,6 @@ const DashboardNavBar: React.FC = () => {
           <>
             <Link to="/technician/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/technician/repairs" className="nav-link">Repairs</Link>
-            <Link to="/technician/schedule" className="nav-link">Schedule</Link>
-            <Link to="/technician/profile" className="nav-link">Profile</Link>
           </>
         );
       case "Customer":
