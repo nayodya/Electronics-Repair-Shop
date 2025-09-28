@@ -8,7 +8,7 @@ services:
     container_name: sqlserver-container
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=Nipun@123
+      - SA_PASSWORD=${SA_PASSWORD}
       - MSSQL_PID=Express
     ports:
       - "1433:1433"
@@ -17,24 +17,74 @@ services:
     networks:
       - app-network
 
-  # .NET API
+  # # .NET API // this is for production build
+  # api:
+  #   build: ./backend
+  #   container_name: api-container
+  #   ports:
+  #     - "5062:5062"
+  #   environment:
+  #     - DOTNET_USE_POLLING_FILE_WATCHER=1
+  #     - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+  #     - ASPNETCORE_URLS=http://+:5062
+  #   depends_on:
+  #     - sqlserver
+  #   networks:
+  #     - app-network
+
+  # .NET API // this is for development
   api:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
     container_name: api-container
     ports:
       - "5062:5062"
     environment:
       - DOTNET_USE_POLLING_FILE_WATCHER=1
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=ERSDB;User Id=sa;Password=Nipun@123;TrustServerCertificate=True;
+      - DOTNET_HOST_PATH=/usr/share/dotnet
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
       - ASPNETCORE_URLS=http://+:5062
+    volumes:
+      - ./backend:/src
+      - /src/bin
+      - /src/obj
     depends_on:
       - sqlserver
     networks:
       - app-network
 
-  # React Frontend
+#   # React Frontend // this is for production build
+#   client:
+#     build: ./frontend
+#     container_name: client-container
+#     ports:
+#       - "5173:5173"
+#     volumes:
+#       - ./frontend:/app
+#       - /app/node_modules
+#     stdin_open: true
+#     tty: true
+#     environment:
+#       - VITE_API_URL=http://localhost:5062
+#       - VITE_HOST=0.0.0.0
+#     depends_on:
+#       - api
+#     networks:
+#       - app-network
+
+# volumes:
+#   sqlserver_data:
+
+# networks:
+#   app-network:
+#     driver: bridge
+
+ # React Frontend (development with hot reload)
   client:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: client-container
     ports:
       - "5173:5173"
@@ -44,8 +94,10 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - VITE_API_URL=http://localhost:5062
+      - VITE_API_URL=http://api:5062
       - VITE_HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true   
+      - WATCHPACK_POLLING=true      
     depends_on:
       - api
     networks:
@@ -57,3 +109,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
+
+    
