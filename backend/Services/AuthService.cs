@@ -177,5 +177,55 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<string> AuthenticateGoogleUserAsync(IEnumerable<Claim> claims)
+    {
+        var googleId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var firstName = claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+        var lastName = claims.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
+
+        if (googleId == null || email == null)
+        {
+            throw new Exception("Insufficient claims received from Google.");
+        }
+
+        // 1. Find user by GoogleId
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+
+        if (user != null)
+        {
+            // User exists, generate a token for them
+            return GenerateJwtToken(user);
+        }
+
+        // 2. If no user with GoogleId, check if an account with that email already exists
+        user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user != null)
+        {
+            // An account with this email exists but is not linked to Google.
+            // Link it now.
+            user.GoogleId = googleId;
+            await _context.SaveChangesAsync();
+            return GenerateJwtToken(user);
+        }
+
+        // 3. If user does not exist at all, create a new one
+        var newUser = new User
+        {
+            GoogleId = googleId,
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            Role = "Customer", // Default role
+            EmailVerifiedAt = DateTime.UtcNow, // Email is verified by Google
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()) // Set a random password hash
+        };
+
+        await _context.Users.AddAsync(newUser);
+        await _context.SaveChangesAsync();
+
+        return GenerateJwtToken(newUser);
+    }
+
 
 }

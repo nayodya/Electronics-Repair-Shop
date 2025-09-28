@@ -25,8 +25,8 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Photo collage section
+{/* 
+      Photo collage section
       <section className="photo-collage">
         <div className="collage-grid">
           <img src="/images/image1.jpg" alt="Repair 1" className="collage-image" />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import PublicFooter from "../Footer/Footer";
-import PublicNavBar from "../NavBar/PublicNavBar/NavBar";
+import PublicNavBar from "../NavBar/PublicNavBar/Navbar";
 
 const PublicLayout: React.FC = () => {
   return (

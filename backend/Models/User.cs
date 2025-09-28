@@ -17,10 +17,13 @@ public class User
 
     [Required]
 
-    public required string PasswordHash { get; set; }
+    public required string? PasswordHash { get; set; }
 
     [Required]
     public required string Role { get; set; }
+
+    public string? GoogleId { get; set; }
+
 
     // Verification properties
     public string? VerificationToken { get; set; }

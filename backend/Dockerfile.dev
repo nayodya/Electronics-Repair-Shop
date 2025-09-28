@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
+WORKDIR /src
+
+# Copy csproj and restore dependencies
+COPY *.sln ./
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy the rest of the code
+COPY . .
+
+# Expose ports
+EXPOSE 5062
+EXPOSE 443
+
+# Enable hot reload with watch
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5062"]
