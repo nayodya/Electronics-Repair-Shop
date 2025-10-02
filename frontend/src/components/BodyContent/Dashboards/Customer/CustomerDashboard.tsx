@@ -1,8 +1,14 @@
 import { useContext, useEffect, useState } from "react";
+import { GiAutoRepair } from "react-icons/gi";
+import { TbReportSearch } from "react-icons/tb";
+import { FaPersonCirclePlus } from "react-icons/fa6";
+import { MdAttachMoney, MdNotificationsActive } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../../context/AuthContext";
 import api from "../../../../services/api";
 import "./CustomerDashboard.css";
+import { GrCompliance } from "react-icons/gr";
+import { RiMoneyDollarCircleFill } from "react-icons/ri";
 
 interface RepairOrder {
   repairRequestId: number;
@@ -52,23 +58,30 @@ const CustomerDashboard = () => {
     {
       title: "New Repair Request",
       description: "Submit a new device for repair",
-      icon: "🔧",
+      icon: <GiAutoRepair />,
       action: () => navigate("/customer/add-repair"),
       color: "primary"
     },
     {
       title: "My Orders",
       description: "View and track your repair orders",
-      icon: "📋",
+      icon: <TbReportSearch />,
       action: () => navigate("/customer/repair-orders"),
       color: "secondary"
     },
     {
       title: "Profile Settings",
       description: "Update your account information",
-      icon: "👤",
+      icon: <FaPersonCirclePlus />,
       action: () => navigate("/customer/edit-profile"),
       color: "tertiary"
+    },
+    {
+      title: "Payments",
+      description: "View and manage your payments",
+      icon: <MdAttachMoney />,
+      action: () => navigate("/customer/repair-payments"),
+      color: "yellow"
     }
   ];
 
@@ -263,19 +276,19 @@ const CustomerDashboard = () => {
     { 
       label: "Active Orders", 
       value: stats.activeOrders.toString(), 
-      icon: "⚡",
+      icon: <MdNotificationsActive />,
       color: "blue" 
     },
     { 
       label: "Completed", 
       value: stats.completedOrders.toString(), 
-      icon: "✅",
+      icon: <GrCompliance />,
       color: "green" 
     },
     { 
       label: "Total Saved", 
       value: `$${stats.totalSaved.toFixed(2)}`, 
-      icon: "💰",
+      icon: <RiMoneyDollarCircleFill />,
       color: "yellow" 
     }
   ];
@@ -324,7 +337,6 @@ const CustomerDashboard = () => {
         <h2>Recent Activity</h2>
         {recentActivity.length === 0 ? (
           <div className="no-activity">
-            <div className="no-activity-icon">📝</div>
             <h3>No recent activity</h3>
             <p>Submit your first repair request to see activity here.</p>
             <button 
