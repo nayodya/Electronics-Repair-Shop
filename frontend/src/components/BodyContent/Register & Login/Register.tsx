@@ -10,13 +10,15 @@ const Register: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         if (password !== confirmPassword) {
             setError("Passwords do not match");
+            setIsSubmitting(false);
             return;
         }
 
@@ -31,11 +33,14 @@ const Register: React.FC = () => {
             setPassword("");
             setConfirmPassword("");
 
-            setTimeout(() => navigate("/login"), 3000);
+            // Show success message for 3 seconds, then redirect to email verification info
+            setTimeout(() => navigate("/email-verification-sent"), 2000);
         } catch (err: any) {
             console.log(err.response);
             setSuccess("");
             setError(err.response?.data?.message || "Registration Failed. Try again.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -46,15 +51,11 @@ const Register: React.FC = () => {
                 <div className="brand-section">
                     <div className="brand-logo">
                         <div className="logo-icon">
-                            <span className="logo-bars">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </span>
+                            <img src="/images/logo.png" alt="TecFix Logo" className="logo-image" />
                         </div>
-                        <span className="brand-name">TechFix Pro</span>
+                        <span className="brand-name">TecFix </span>
                     </div>
-                    
+
                     <div className="brand-content">
                         <h1>Building the Future...</h1>
                         <p>
@@ -62,7 +63,6 @@ const Register: React.FC = () => {
                             Get access to professional diagnostics and quality repairs
                             with our certified technicians.
                         </p>
-                        <div className="brand-accent"></div>
                     </div>
                 </div>
             </div>
@@ -86,6 +86,7 @@ const Register: React.FC = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="form-input"
                                 required
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -100,6 +101,7 @@ const Register: React.FC = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="form-input password-input"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </div>
@@ -115,6 +117,7 @@ const Register: React.FC = () => {
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     className="form-input password-input"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </div>
@@ -133,8 +136,8 @@ const Register: React.FC = () => {
                             </div>
                         )}
 
-                        <button type="submit" className="register-button">
-                            GET STARTED
+                        <button type="submit" className="register-button" disabled={isSubmitting}>
+                            {isSubmitting ? "CREATING ACCOUNT..." : "GET STARTED"}
                         </button>
 
                         <div className="divider">

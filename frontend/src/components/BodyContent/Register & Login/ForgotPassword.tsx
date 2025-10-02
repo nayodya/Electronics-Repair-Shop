@@ -47,13 +47,9 @@ const ForgotPassword: React.FC = () => {
         <div className="brand-section">
           <div className="brand-logo">
             <div className="logo-icon">
-              <span className="logo-bars">
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
+              <img src="/images/logo.png" alt="TecFix Logo" className="logo-image" />
             </div>
-            <span className="brand-name">TechFix Pro</span>
+            <span className="brand-name">TecFix </span>
           </div>
           
           <div className="brand-content">

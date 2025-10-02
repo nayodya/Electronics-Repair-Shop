@@ -4,17 +4,24 @@ import { MdFeaturedPlayList } from "react-icons/md";
 import { BsLaptop } from "react-icons/bs";
 import { GiAutoRepair } from "react-icons/gi";
 import { MdEngineering } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+
+  const navigate = useNavigate();
+
+  const repairPage = () => {
+    navigate("/login");
+  }
+
   return (
-    <div className="Mainbody">
-      {/* Hero Section */}
+    <div className="Mainbody">  
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-text">
             <h1>Professional Electronics Repair Services</h1>
             <p >Expert solutions for all your electronic devices with 8+ years of experience</p>
-            <button className="cta-button">Repair</button>
+            <button className="cta-button" onClick={repairPage}>Repair</button>
           </div>
           <div className="hero-image">
             <div className="repair-illustration">
@@ -25,8 +32,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-{/* 
-      Photo collage section
+
       <section className="photo-collage">
         <div className="collage-grid">
           <img src="/images/image1.jpg" alt="Repair 1" className="collage-image" />
@@ -39,19 +45,6 @@ const Home: React.FC = () => {
           <img src="/images/image8.jpeg" alt="Repair 8" className="collage-image" />
           <img src="/images/image9.jpg" alt="Repair 9" className="collage-image" />
           <img src="/images/image10.jpg" alt="Repair " className="collage-image" />
-        </div>
-      </section> */}
-
-
-      {/* Client Logos Section */}
-      <section className="clients-section">
-        <h3>Our Clients</h3>
-        <div className="client-logos">
-          <div className="logo-item">Apple</div>
-          <div className="logo-item">Samsung</div>
-          <div className="logo-item">Sony</div>
-          <div className="logo-item">LG</div>
-          <div className="logo-item">HP</div>
         </div>
       </section>
 
@@ -196,11 +189,10 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="final-cta">
         <h2>Ready to fix your device?</h2>
         <p>Get professional repair services today</p>
-        <button className="cta-button large">Get Started</button>
+        <button className="cta-button large" onClick={repairPage}>Get Started</button>
       </section>
     </div>
   );

@@ -26,22 +26,17 @@ const LoginPage = () => {
         <div className="brand-section">
           <div className="brand-logo">
             <div className="logo-icon">
-              <span className="logo-bars">
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
+              <img src="/images/logo.png" alt="TecFix Logo" className="logo-image" />
             </div>
-            <span className="brand-name">TechFix Pro</span>
+            <span className="brand-name">TecFix </span>
           </div>
           
           <div className="brand-content">
-            <h1>Fixing the Future...</h1>
+            <h1>Fixing the Future...</h1> 
             <p>
               Expert electronics repair services with cutting-edge technology.
               Join our platform to manage your repairs and track your devices.
             </p>
-            <div className="brand-accent"></div>
           </div>
         </div>
       </div>

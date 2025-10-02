@@ -1,15 +1,10 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "./DashboardNavBar.css"
 
 const DashboardNavBar: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useContext(AuthContext);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
 
   const getDashboardLinks = () => {
     switch (user?.role) {
@@ -20,7 +15,6 @@ const DashboardNavBar: React.FC = () => {
             <Link to="/admin/dashboard/requests" className="nav-link">Repairs</Link>
             <Link to="/admin/dashboard/users" className="nav-link">Users</Link>
             <Link to="/admin/dashboard/payments" className="nav-link">Payments</Link>
-
           </>
         );
       case "Technician":
@@ -48,7 +42,7 @@ const DashboardNavBar: React.FC = () => {
   return (
     <div className="dashboard-navbar">
       <div className="logo-section">
-        <img src="" alt="Logo" />
+        <img src="/images/logo.png" alt="Logo" />
         <Link to="/" className="brand-name">TechFix Pro</Link>
       </div>
 
@@ -57,26 +51,8 @@ const DashboardNavBar: React.FC = () => {
       </div>
 
       <div className="nav-actions">
-        <span className="user-info">Welcome, {user?.email}</span>
+        <span className="user-info">Welcome</span>
         <button onClick={logout} className="logout-btn">Logout</button>
-      </div>
-
-      <button 
-        className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
-        onClick={toggleMobileMenu}
-        aria-label="Toggle mobile menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-        {getDashboardLinks()}
-        <div className="mobile-actions">
-          <span className="mobile-user-info">Welcome, {user?.email}</span>
-          <button onClick={logout} className="mobile-logout-btn">Logout</button>
-        </div>
       </div>
     </div>
   );

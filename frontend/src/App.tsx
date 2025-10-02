@@ -11,7 +11,7 @@ import Register from "./components/BodyContent/Register & Login/Register";
 import LogIn from "./components/BodyContent/Register & Login/LogIn";
 import ForgotPassword from "./components/BodyContent/Register & Login/ForgotPassword";
 import ResetPassword from "./components/BodyContent/Register & Login/ResetPassword";
-
+import EmailVerificationSent from "./components/BodyContent/Register & Login/EmailVerificationSent";
 // Dashboard pages
 import CustomerDashboard from "./components/BodyContent/Dashboards/Customer/CustomerDashboard";
 import AddRepairOrderPage from "./components/BodyContent/Dashboards/Customer/AddRepair";
@@ -30,11 +30,11 @@ import RepairingStatus from "./components/BodyContent/Dashboards/Technician/Repa
 import ManagePayments from "./components/BodyContent/Dashboards/Admin/ManagePayments";
 import RepairPayments from "./components/BodyContent/Dashboards/Customer/RepairPayments";
 
+
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Routes with Public Layout */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="services" element={<Services />} />
@@ -44,9 +44,9 @@ function App() {
           <Route path="login" element={<LogIn />} />
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="email-verification-sent" element={<EmailVerificationSent />} />
         </Route>
 
-        {/* Protected Customer Routes with Dashboard Layout */}
         <Route path="/customer" element={
           <ProtectedRoute allowedRoles={["Customer"]}>
             <DashboardLayout />
@@ -59,7 +59,6 @@ function App() {
           <Route path="repair-payments" element={<RepairPayments />} />
         </Route>
 
-        {/* Protected Technician Routes with Dashboard Layout */}
         <Route path="/technician" element={
           <ProtectedRoute allowedRoles={["Technician"]}>
             <DashboardLayout />
@@ -69,7 +68,6 @@ function App() {
           <Route path="repairs" element={<div><RepairingStatus/></div>} />
         </Route>
 
-        {/* Protected Admin Routes with Dashboard Layout */}
         <Route path="/admin" element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout />
