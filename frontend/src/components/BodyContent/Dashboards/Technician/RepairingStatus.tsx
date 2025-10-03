@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../../context/AuthContext";
 import api from "../../../../services/api";
 import "./RepairingStatus.css";
 
@@ -35,49 +36,32 @@ interface RepairOrder {
 }
 
 const RepairingStatus = () => {
-  const location = useLocation();
+  const { token } = useContext(AuthContext);
   const navigate = useNavigate();
-  const order: RepairOrder | undefined = location.state?.order;
-
   const [repairs, setRepairs] = useState<RepairRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [selectedRepair, setSelectedRepair] = useState<RepairRequest | null>(null);
-  const [status, setStatus] = useState<number>(0);
+  const [newStatus, setNewStatus] = useState<number>(0);
   const [estimatedDays, setEstimatedDays] = useState<number | ''>('');
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
 
   useEffect(() => {
-    if (order) {
-      // If coming from dashboard with specific order, set it as selected
-      const mockRepair: RepairRequest = {
-        requestId: order.requestId,
-        referenceNumber: order.referenceNumber,
-        device: order.device,
-        brand: order.brand,
-        model: order.model,
-        issue: order.issue,
-        status: order.status,
-        submittedAt: order.submittedAt,
-        customer: {
-          userId: 0,
-          name: order.customerName || '',
-          email: '',
-          phone: ''
-        }
-      };
-      setSelectedRepair(mockRepair);
-      setStatus(order.status);
-    } else {
-      // Otherwise, fetch all assigned repairs
-      fetchAssignedRepairs();
-    }
-  }, [order]);
+    fetchAssignedRepairs();
+  }, [token]);
 
   const fetchAssignedRepairs = async () => {
     try {
-      setFetchLoading(true);
-      const response = await api.get('/technician/assigned-repairs');
+      setLoading(true);
+      const response = await api.get('/technician/assigned-repairs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       if (Array.isArray(response.data)) {
         setRepairs(response.data);
@@ -86,41 +70,9 @@ const RepairingStatus = () => {
       }
     } catch (err: any) {
       console.error('Error fetching repairs:', err);
-      setMessage("Failed to fetch assigned repairs");
+      setError("Failed to fetch assigned repairs");
     } finally {
-      setFetchLoading(false);
-    }
-  };
-
-  const getStatusOptions = (currentStatus: number) => {
-    // Define valid status transitions based on current status
-    switch (currentStatus) {
-      case 0: // Received
-        return [
-          { value: 0, label: "Received" },
-          { value: 1, label: "In Progress" },
-          { value: 3, label: "Cancelled" }
-        ];
-      case 1: // In Progress
-        return [
-          { value: 1, label: "In Progress" },
-          { value: 2, label: "Completed" },
-          { value: 3, label: "Cancelled" }
-        ];
-      case 2: // Completed
-        return [
-          { value: 2, label: "Completed" },
-          { value: 4, label: "Ready for Delivery" }
-        ];
-      case 4: // Ready for Delivery
-        return [
-          { value: 4, label: "Ready for Delivery" },
-          { value: 5, label: "Delivered" }
-        ];
-      default:
-        return [
-          { value: currentStatus, label: getStatusLabel(currentStatus) }
-        ];
+      setLoading(false);
     }
   };
 
@@ -136,226 +88,410 @@ const RepairingStatus = () => {
     }
   };
 
-  const getStatusColor = (statusValue: number): string => {
+  const getStatusClass = (statusValue: number): string => {
     switch (statusValue) {
-      case 0: return '#ffc107';
-      case 1: return '#17a2b8';
-      case 2: return '#28a745';
-      case 3: return '#dc3545';
-      case 4: return '#6f42c1';
-      case 5: return '#20c997';
-      default: return '#6c757d';
+      case 0: return "received";
+      case 1: return "inprogress";
+      case 2: return "completed";
+      case 3: return "unpaid";
+      case 4: return "readyfordelivery";
+      case 5: return "completed";
+      default: return "received";
+    }
+  };
+
+  const getStatusOptions = (currentStatus: number) => {
+    switch (currentStatus) {
+      case 0: return [
+        { value: 0, label: "Received" },
+        { value: 1, label: "In Progress" },
+        { value: 3, label: "Cancelled" }
+      ];
+      case 1: return [
+        { value: 1, label: "In Progress" },
+        { value: 2, label: "Completed" },
+        { value: 3, label: "Cancelled" }
+      ];
+      case 2: return [
+        { value: 2, label: "Completed" },
+        { value: 4, label: "Ready for Delivery" }
+      ];
+      case 4: return [
+        { value: 4, label: "Ready for Delivery" },
+        { value: 5, label: "Delivered" }
+      ];
+      default: return [
+        { value: currentStatus, label: getStatusLabel(currentStatus) }
+      ];
     }
   };
 
   const canUpdateStatus = (statusValue: number): boolean => {
-    return statusValue !== 5 && statusValue !== 3; // Can't update if Delivered or Cancelled
+    return statusValue !== 5 && statusValue !== 3;
   };
 
-  const handleRepairSelect = (repair: RepairRequest) => {
+  const filteredRepairs = repairs.filter(repair => {
+    const matchesTab = activeTab === "all" || 
+                      (activeTab === "received" && repair.status === 0) ||
+                      (activeTab === "inprogress" && repair.status === 1) ||
+                      (activeTab === "completed" && repair.status === 2) ||
+                      (activeTab === "ready" && repair.status === 4);
+
+    const matchesSearch = repair.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         repair.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         repair.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         repair.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === "all" || repair.status.toString() === statusFilter;
+    const matchesDate = !dateFilter || repair.submittedAt.includes(dateFilter);
+
+    return matchesTab && matchesSearch && matchesStatus && matchesDate;
+  });
+
+  const getTabCount = (status: string) => {
+    if (status === "all") return repairs.length;
+    if (status === "received") return repairs.filter(r => r.status === 0).length;
+    if (status === "inprogress") return repairs.filter(r => r.status === 1).length;
+    if (status === "completed") return repairs.filter(r => r.status === 2).length;
+    if (status === "ready") return repairs.filter(r => r.status === 4).length;
+    return 0;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setDateFilter("");
+  };
+
+  const handleUpdateClick = (repair: RepairRequest) => {
     setSelectedRepair(repair);
-    setStatus(repair.status);
+    setNewStatus(repair.status);
     setEstimatedDays('');
-    setMessage('');
+    setUpdateMessage("");
+    setShowModal(true);
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStatus = Number(e.target.value);
-    setStatus(newStatus);
-    
-    // Clear estimated days if not changing to "In Progress"
-    if (newStatus !== 1) {
-      setEstimatedDays('');
-    }
-  };
-
-  const handleEstimatedDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEstimatedDays(value === '' ? '' : Number(value));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleStatusUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRepair) return;
-    
-    setLoading(true);
-    setMessage("");
-    
-    try {
-      const requestBody: any = {
-        status: status
-      };
 
-      // Add estimated completion days if status is "In Progress" and days are provided
-      if (status === 1 && estimatedDays !== '') {
+    setIsUpdating(true);
+    setUpdateMessage("");
+
+    try {
+      const requestBody: any = { status: newStatus };
+
+      if (newStatus === 1 && estimatedDays !== '') {
         requestBody.estimatedCompletionDays = estimatedDays;
       }
 
-      await api.put(`/technician/repair/${selectedRepair.requestId}/status`, requestBody);
+      await api.put(`/technician/repair/${selectedRepair.requestId}/status`, requestBody, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setUpdateMessage("Status updated successfully!");
       
-      setMessage("✅ Status updated successfully!");
-      
-      // Refresh the repairs list if we're showing all repairs
-      if (!order) {
-        setTimeout(() => {
-          fetchAssignedRepairs();
-          setSelectedRepair(null);
-          setMessage('');
-        }, 1200);
-      } else {
-        setTimeout(() => navigate(-1), 1200);
-      }
+      setTimeout(() => {
+        setShowModal(false);
+        fetchAssignedRepairs();
+        setSelectedRepair(null);
+        setUpdateMessage("");
+      }, 1500);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.response?.data || "Failed to update status.";
-      setMessage(`❌ ${errorMessage}`);
+      const errorMessage = err.response?.data?.message || "Failed to update status.";
+      setUpdateMessage(errorMessage);
     } finally {
-      setLoading(false);
+      setIsUpdating(false);
     }
   };
 
-  if (fetchLoading) {
-    return <div className="repair-status-container loading">Loading assigned repairs...</div>;
+  if (loading) {
+    return <div className="loading">Loading assigned repairs...</div>;
   }
 
-  // If we have a specific order from dashboard, show the update form
-  if (order || selectedRepair) {
-    const currentRepair = selectedRepair || order;
-    if (!currentRepair) return null;
-
-    const statusOptions = getStatusOptions(currentRepair.status);
-    const showEstimatedDays = status === 1;
-
-    return (
-      <div className="repair-status-container">
-        <h2>Update Repair Status</h2>
-        <div className="repair-status-details">
-          <div><strong>Reference:</strong> {currentRepair.referenceNumber}</div>
-          <div><strong>Device:</strong> {currentRepair.brand} {currentRepair.model} ({currentRepair.device})</div>
-          <div><strong>Issue:</strong> {currentRepair.issue}</div>
-          <div><strong>Customer:</strong> {selectedRepair?.customer?.name || ("customerName" in currentRepair ? (currentRepair as RepairOrder).customerName : "") || "N/A"}</div>
-          <div><strong>Current Status:</strong> {getStatusLabel(currentRepair.status)}</div>
-          <div><strong>Submitted:</strong> {new Date(currentRepair.submittedAt).toLocaleDateString()}</div>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="repair-status-form">
-          <label htmlFor="status-select"><strong>New Status:</strong></label>
-          <select
-            id="status-select"
-            value={status}
-            onChange={handleStatusChange}
-            className="repair-status-select"
-            disabled={loading}
-          >
-            {statusOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-
-          {showEstimatedDays && (
-            <div className="estimated-days-section">
-              <label htmlFor="estimated-days"><strong>Estimated Completion Days:</strong></label>
-              <input
-                id="estimated-days"
-                type="number"
-                value={estimatedDays}
-                onChange={handleEstimatedDaysChange}
-                placeholder="Enter estimated days (optional)"
-                className="repair-status-input"
-                min="1"
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          <div className="repair-status-actions">
-            <button
-              type="submit"
-              className="repair-status-btn"
-              disabled={loading}
-            >
-              {loading ? "Saving..." : "Update Status"}
-            </button>
-            <button
-              type="button"
-              className="repair-status-back"
-              onClick={() => order ? navigate(-1) : setSelectedRepair(null)}
-              disabled={loading}
-            >
-              {order ? "Cancel" : "Back to List"}
-            </button>
-          </div>
-          {message && <div className="repair-status-message">{message}</div>}
-        </form>
-      </div>
-    );
+  if (error) {
+    return <div className="error">{error}</div>;
   }
 
-  // Show all assigned repairs list
   return (
-    <div className="repair-status-container">
-      <h2>Assigned Repairs</h2>
-      
-      {repairs.length === 0 ? (
-        <div className="no-repairs">
-          <p>No repairs assigned yet.</p>
-          <button 
-            className="repair-status-back"
-            onClick={() => navigate(-1)}
+    <div className="manage-payments">
+      <div className="header">
+        <h1>Repair Status Management</h1>
+        <button 
+          className="btn-primary"
+          onClick={() => navigate("/technician/dashboard")}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
+
+      <div className="tabs">
+        <button 
+          className={`tab ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          All Repairs ({getTabCount("all")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "received" ? "active" : ""}`}
+          onClick={() => setActiveTab("received")}
+        >
+          Received ({getTabCount("received")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "inprogress" ? "active" : ""}`}
+          onClick={() => setActiveTab("inprogress")}
+        >
+          In Progress ({getTabCount("inprogress")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "completed" ? "active" : ""}`}
+          onClick={() => setActiveTab("completed")}
+        >
+          Completed ({getTabCount("completed")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "ready" ? "active" : ""}`}
+          onClick={() => setActiveTab("ready")}
+        >
+          Ready ({getTabCount("ready")})
+        </button>
+      </div>
+
+      <div className="filters-container">
+        <div className="filter-row">
+          <input
+            type="text"
+            placeholder="Search by reference number, device, or customer name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            Back to Dashboard
-          </button>
+            <option value="all">All Statuses</option>
+            <option value="0">Received</option>
+            <option value="1">In Progress</option>
+            <option value="2">Completed</option>
+            <option value="3">Cancelled</option>
+            <option value="4">Ready for Delivery</option>
+            <option value="5">Delivered</option>
+          </select>
+          <input
+            type="month"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            placeholder="Filter by month"
+          />
+          <button onClick={clearFilters}>Clear Filters</button>
         </div>
-      ) : (
-        <div className="repairs-list">
-          {repairs.map(repair => (
-            <div key={repair.requestId} className="repair-item">
-              <div className="repair-item-header">
-                <h3>#{repair.referenceNumber}</h3>
-                <span 
-                  className="status-badge" 
-                  style={{ backgroundColor: getStatusColor(repair.status) }}
-                >
-                  {getStatusLabel(repair.status)}
-                </span>
-              </div>
-              
-              <div className="repair-item-details">
-                <p><strong>Device:</strong> {repair.brand} {repair.model} ({repair.device})</p>
-                <p><strong>Issue:</strong> {repair.issue}</p>
-                {repair.description && (
-                  <p><strong>Description:</strong> {repair.description}</p>
+      </div>
+
+      <div className="table-container">
+        <table className="payments-table">
+          <thead>
+            <tr>
+              <th>Reference #</th>
+              <th>Device</th>
+              <th>Issue</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Submitted Date</th>
+              <th>Est. Days</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRepairs.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '40px' }}>
+                  <div>
+                    <h3>No repairs found</h3>
+                    <p>
+                      {activeTab === "all" 
+                        ? "No repairs assigned yet." 
+                        : `No repairs with status "${activeTab}" found.`
+                      }
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              filteredRepairs.map((repair) => (
+                <tr key={repair.requestId}>
+                  <td data-label="Reference #">
+                    <strong>{repair.referenceNumber}</strong>
+                  </td>
+                  <td data-label="Device">
+                    <div>
+                      <strong>{repair.brand} {repair.model}</strong>
+                      <br />
+                      <small>{repair.device}</small>
+                    </div>
+                  </td>
+                  <td data-label="Issue">
+                    <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {repair.issue.length > 50 
+                        ? `${repair.issue.substring(0, 50)}...` 
+                        : repair.issue
+                      }
+                    </div>
+                  </td>
+                  <td data-label="Customer">
+                    <div>
+                      <strong>{repair.customer.name}</strong>
+                      <br />
+                      <small>{repair.customer.phone}</small>
+                    </div>
+                  </td>
+                  <td data-label="Status">
+                    <span className={`status-badge ${getStatusClass(repair.status)}`}>
+                      {getStatusLabel(repair.status)}
+                    </span>
+                  </td>
+                  <td data-label="Submitted Date">
+                    {formatDate(repair.submittedAt)}
+                  </td>
+                  <td data-label="Est. Days">
+                    {repair.estimatedCompletionDays || "Not set"}
+                  </td>
+                  <td data-label="Actions">
+                    <div className="actions">
+                      {canUpdateStatus(repair.status) ? (
+                        <button
+                          className="btn-edit"
+                          onClick={() => handleUpdateClick(repair)}
+                        >
+                          Update Status
+                        </button>
+                      ) : (
+                        <span style={{ color: '#6c757d', fontSize: '12px' }}>
+                          Cannot Update
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredRepairs.length > 0 && (
+        <div className="statistics-container">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>Total Assigned</h3>
+              <p className="stat-number">{repairs.length}</p>
+            </div>
+            <div className="stat-card">
+              <h3>In Progress</h3>
+              <p className="stat-number warning">
+                {repairs.filter(r => r.status === 1).length}
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>Completed</h3>
+              <p className="stat-number success">
+                {repairs.filter(r => r.status === 2).length}
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>Ready for Delivery</h3>
+              <p className="stat-number">
+                {repairs.filter(r => r.status === 4).length}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Update Modal */}
+      {showModal && selectedRepair && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>Update Repair Status</h2>
+              <button onClick={() => setShowModal(false)}>×</button>
+            </div>
+            
+            <form onSubmit={handleStatusUpdate}>
+              <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '5px' }}>
+                  <p><strong>Reference:</strong> {selectedRepair.referenceNumber}</p>
+                  <p><strong>Device:</strong> {selectedRepair.brand} {selectedRepair.model}</p>
+                  <p><strong>Customer:</strong> {selectedRepair.customer.name}</p>
+                  <p><strong>Current Status:</strong> {getStatusLabel(selectedRepair.status)}</p>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="status-select">New Status</label>
+                  <select
+                    id="status-select"
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(Number(e.target.value))}
+                    disabled={isUpdating}
+                  >
+                    {getStatusOptions(selectedRepair.status).map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {newStatus === 1 && (
+                  <div className="form-group">
+                    <label htmlFor="estimated-days">Estimated Completion Days (Optional)</label>
+                    <input
+                      id="estimated-days"
+                      type="number"
+                      value={estimatedDays}
+                      onChange={(e) => setEstimatedDays(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="Enter estimated days"
+                      min="1"
+                      disabled={isUpdating}
+                    />
+                  </div>
                 )}
-                <p><strong>Customer:</strong> {repair.customer?.name || 'N/A'}</p>
-                <p><strong>Phone:</strong> {repair.customer?.phone || 'N/A'}</p>
-                <p><strong>Email:</strong> {repair.customer?.email || 'N/A'}</p>
-                <p><strong>Submitted:</strong> {new Date(repair.submittedAt).toLocaleDateString()}</p>
-                {repair.estimatedCompletionDays && (
-                  <p><strong>Est. Completion:</strong> {repair.estimatedCompletionDays} days</p>
+
+                {updateMessage && (
+                  <div style={{ 
+                    padding: '10px', 
+                    borderRadius: '4px', 
+                    marginBottom: '15px',
+                    background: updateMessage.includes('successfully') ? '#d4edda' : '#f8d7da',
+                    color: updateMessage.includes('successfully') ? '#155724' : '#721c24'
+                  }}>
+                    {updateMessage}
+                  </div>
                 )}
               </div>
 
-              <div className="repair-item-actions">
-                {canUpdateStatus(repair.status) ? (
-                  <button 
-                    className="update-status-btn"
-                    onClick={() => handleRepairSelect(repair)}
-                  >
-                    Update Status
-                  </button>
-                ) : (
-                  <span className="status-final">Status cannot be changed</span>
-                )}
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Updating..." : "Update Status"}
+                </button>
               </div>
-            </div>
-          ))}
-          
-          <div className="back-section">
-            <button 
-              className="repair-status-back"
-              onClick={() => navigate(-1)}
-            >
-              Back to Dashboard
-            </button>
+            </form>
           </div>
         </div>
       )}

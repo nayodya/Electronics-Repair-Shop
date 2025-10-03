@@ -1,4 +1,3 @@
-// src/pages/ShowRepairOrdersPage.tsx
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../../context/AuthContext";
@@ -6,13 +5,13 @@ import "./RepairHistory.css";
 import api from "../../../../services/api";
 
 interface RepairOrder {
-  repairRequestId: number; // Changed from string to number
+  repairRequestId: number;
   referenceNumber: string;
   device: {
     make: string;
     model: string;
-    serialNumber: string; // Added serialNumber
-    deviceType?: string; // Made optional since it's not in your backend response
+    serialNumber: string;
+    deviceType?: string;
   };
   status: string;
   issueDescription: string;
@@ -27,7 +26,10 @@ const RepairHistory = () => {
   const [orders, setOrders] = useState<RepairOrder[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
   
   useEffect(() => {
     const fetchOrders = async () => {
@@ -35,17 +37,16 @@ const RepairHistory = () => {
         const res = await api.get("/Repair/my-requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Map backend data to frontend shape
         const mappedOrders: RepairOrder[] = res.data.map((item: any) => ({
           repairRequestId: item.requestId,
           referenceNumber: item.referenceNumber,
           device: {
             make: item.brand,
             model: item.model,
-            serialNumber: "", // or item.serialNumber if available
-            deviceType: "",   // or item.deviceType if available
+            serialNumber: item.serialNumber || "N/A",
+            deviceType: item.deviceType || "Electronic Device",
           },
-          status: mapStatus(item.status), // convert status number to string
+          status: mapStatus(item.status),
           issueDescription: item.description || item.issue || "",
           createdAt: item.submittedAt,
           estimatedCost: item.estimatedCost,
@@ -71,36 +72,31 @@ const RepairHistory = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch (status.toLowerCase()) {
-      case "pending": return "pending";
-      case "received": return "pending"; // Added for your "Received" status
-      case "in progress": return "progress";
+      case "received": return "received";
+      case "in progress": return "inprogress";
       case "completed": return "completed";
-      case "cancelled": return "cancelled";
-      default: return "pending";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending": return "⏳";
-      case "received": return "📥"; // Added icon for "Received" status
-      case "in progress": return "🔧";
-      case "completed": return "✅";
-      case "cancelled": return "❌";
-      default: return "⏳";
+      case "cancelled": return "unpaid";
+      default: return "received";
     }
   };
 
   const filteredOrders = orders.filter(order => {
-    if (filter === "all") return true;
-    // Handle both "received" and "pending" in the same filter for now
-    if (filter === "pending") {
-      return order.status.toLowerCase() === "pending" || order.status.toLowerCase() === "received";
-    }
-    return order.status.toLowerCase() === filter;
+    const matchesTab = activeTab === "all" || order.status.toLowerCase().replace(" ", "") === activeTab;
+    const matchesSearch = order.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.device.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.device.model.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || order.status.toLowerCase().replace(" ", "") === statusFilter;
+    const matchesDate = !dateFilter || order.createdAt.includes(dateFilter);
+    
+    return matchesTab && matchesSearch && matchesStatus && matchesDate;
   });
+
+  const getTabCount = (status: string) => {
+    if (status === "all") return orders.length;
+    return orders.filter(order => order.status.toLowerCase().replace(" ", "") === status).length;
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -110,149 +106,197 @@ const RepairHistory = () => {
     });
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setDateFilter("");
+  };
+
   if (isLoading) {
-    return (
-      <div className="repair-history-container">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading your repair orders...</p>
-        </div>
-      </div>
-    );
+    return <div className="loading">Loading repair orders...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
   }
 
   return (
-    <div className="repair-history-container">
-      <div className="repair-history-header">
+    <div className="manage-payments">
+      <div className="header">
+        <h1>My Repair History</h1>
         <button 
-          className="back-button"
-          onClick={() => navigate("/customer/dashboard")}
+          className="btn-primary"
+          onClick={() => navigate("/customer/add-repair")}
         >
-          ← Back to Dashboard
+          + New Repair Request
         </button>
-        <h1>My Repair Orders</h1>
-        <p>Track and manage all your device repair requests</p>
       </div>
 
-      {error && (
-        <div className="error-message">
-          <div className="error-icon">❌</div>
-          <div className="error-text">{error}</div>
+      <div className="tabs">
+        <button 
+          className={`tab ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          All Orders ({getTabCount("all")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "received" ? "active" : ""}`}
+          onClick={() => setActiveTab("received")}
+        >
+          Received ({getTabCount("received")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "inprogress" ? "active" : ""}`}
+          onClick={() => setActiveTab("inprogress")}
+        >
+          In Progress ({getTabCount("inprogress")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "completed" ? "active" : ""}`}
+          onClick={() => setActiveTab("completed")}
+        >
+          Completed ({getTabCount("completed")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "cancelled" ? "active" : ""}`}
+          onClick={() => setActiveTab("cancelled")}
+        >
+          Cancelled ({getTabCount("cancelled")})
+        </button>
+      </div>
+
+      <div className="filters-container">
+        <div className="filter-row">
+          <input
+            type="text"
+            placeholder="Search by reference number, device make or model..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            <option value="received">Received</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <input
+            type="month"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            placeholder="Filter by month"
+          />
+          <button onClick={clearFilters}>Clear Filters</button>
+        </div>
+      </div>
+
+      <div className="table-container">
+        <table className="payments-table">
+          <thead>
+            <tr>
+              <th>Reference #</th>
+              <th>Device</th>
+              <th>Issue Description</th>
+              <th>Status</th>
+              <th>Submitted Date</th>
+              <th>Estimated Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '40px' }}>
+                  <div>
+                    <h3>No repair orders found</h3>
+                    <p>
+                      {activeTab === "all" 
+                        ? "You haven't submitted any repair requests yet." 
+                        : `No orders with status "${activeTab}" found.`
+                      }
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              filteredOrders.map((order) => (
+                <tr key={order.repairRequestId}>
+                  <td data-label="Reference #">
+                    <strong>{order.referenceNumber}</strong>
+                  </td>
+                  <td data-label="Device">
+                    <div>
+                      <strong>{order.device.make} {order.device.model}</strong>
+                      <br />
+                      <small>{order.device.deviceType}</small>
+                      {order.device.serialNumber !== "N/A" && (
+                        <>
+                          <br />
+                          <small>Serial: {order.device.serialNumber}</small>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td data-label="Issue Description">
+                    <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {order.issueDescription.length > 50 
+                        ? `${order.issueDescription.substring(0, 50)}...` 
+                        : order.issueDescription
+                      }
+                    </div>
+                  </td>
+                  <td data-label="Status">
+                    <span className={`status-badge ${getStatusClass(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td data-label="Submitted Date">
+                    {formatDate(order.createdAt)}
+                  </td>
+                  <td data-label="Estimated Cost">
+                    {order.estimatedCost ? `$${order.estimatedCost.toFixed(2)}` : "Pending"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredOrders.length > 0 && (
+        <div className="statistics-container">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>Total Orders</h3>
+              <p className="stat-number">{orders.length}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Completed Orders</h3>
+              <p className="stat-number success">
+                {orders.filter(o => o.status.toLowerCase() === "completed").length}
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>In Progress</h3>
+              <p className="stat-number warning">
+                {orders.filter(o => o.status.toLowerCase() === "in progress").length}
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>Total Spent</h3>
+              <p className="stat-number">
+                ${orders
+                  .filter(o => o.status.toLowerCase() === "completed" && o.estimatedCost)
+                  .reduce((sum, o) => sum + (o.estimatedCost || 0), 0)
+                  .toFixed(2)
+                }
+              </p>
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="filter-section">
-        <div className="filter-buttons">
-          <button 
-            className={filter === "all" ? "active" : ""}
-            onClick={() => setFilter("all")}
-          >
-            All Orders ({orders.length})
-          </button>
-          <button 
-            className={filter === "pending" ? "active" : ""}
-            onClick={() => setFilter("pending")}
-          >
-            Pending/Received ({orders.filter(o => 
-              o.status.toLowerCase() === "pending" || o.status.toLowerCase() === "received"
-            ).length})
-          </button>
-          <button 
-            className={filter === "in progress" ? "active" : ""}
-            onClick={() => setFilter("in progress")}
-          >
-            In Progress ({orders.filter(o => o.status.toLowerCase() === "in progress").length})
-          </button>
-          <button 
-            className={filter === "completed" ? "active" : ""}
-            onClick={() => setFilter("completed")}
-          >
-            Completed ({orders.filter(o => o.status.toLowerCase() === "completed").length})
-          </button>
-        </div>
-      </div>
-
-      <div className="orders-container">
-        {filteredOrders.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📋</div>
-            <h3>No repair orders found</h3>
-            <p>
-              {filter === "all" 
-                ? "You haven't submitted any repair requests yet." 
-                : `No orders with status "${filter}" found.`
-              }
-            </p>
-            <button 
-              className="create-order-button"
-              onClick={() => navigate("/customer/add-repair")}
-            >
-              Submit New Repair Request
-            </button>
-          </div>
-        ) : (
-          <div className="orders-grid">
-            {filteredOrders.map((order) => (
-              <div key={order.repairRequestId} className="order-card">
-                <div className="order-header">
-                  <div className="order-reference">
-                    <h3>{order.referenceNumber}</h3>
-                    <span className={`status-badge ${getStatusColor(order.status)}`}>
-                      {getStatusIcon(order.status)} {order.status}
-                    </span>
-                  </div>
-                  <div className="order-date">
-                    {formatDate(order.createdAt)}
-                  </div>
-                </div>
-
-                <div className="device-info">
-                  <div className="device-details">
-                    <h4>{order.device.make} {order.device.model}</h4>
-                    {order.device.deviceType && (
-                      <p className="device-type">{order.device.deviceType}</p>
-                    )}
-                    <p className="serial-number">Serial: {order.device.serialNumber}</p>
-                  </div>
-                </div>
-
-                <div className="issue-description">
-                  <h5>Issue Description:</h5>
-                  <p>{order.issueDescription}</p>
-                </div>
-
-                {order.estimatedCost && (
-                  <div className="cost-info">
-                    <span className="cost-label">Estimated Cost:</span>
-                    <span className="cost-value">${order.estimatedCost}</span>
-                  </div>
-                )}
-
-                {order.completedAt && (
-                  <div className="completion-info">
-                    <span className="completion-label">Completed on:</span>
-                    <span className="completion-date">{formatDate(order.completedAt)}</span>
-                  </div>
-                )}
-
-                <div className="order-actions">
-                  <button
-                    className="view-details-button"
-                    onClick={() => navigate("/customer/repair-order-details", { state: { order } })}
-                  >
-                    View Details
-                  </button>
-                  {order.status.toLowerCase() === "completed" && (
-                    <button className="download-receipt-button">
-                      Download Receipt
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

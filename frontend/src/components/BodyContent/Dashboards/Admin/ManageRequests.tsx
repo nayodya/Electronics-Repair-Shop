@@ -372,17 +372,6 @@ const ManageRequests: React.FC = () => {
             <option value="4">Ready for Delivery</option>
             <option value="5">Delivered</option>
           </select>
-          <button 
-            className="admin-btn admin-btn-secondary"
-            onClick={() => {
-              setError("");
-              setMessage("");
-              fetchRequests();
-            }}
-            disabled={loading}
-          >
-            🔄 Refresh
-          </button>
         </div>
       </div>
 

@@ -3,6 +3,8 @@ import { AuthContext } from "../../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../../../../services/api";
 import "./AddRepair.css";
+import { FaCopy } from "react-icons/fa6";
+import { TbArrowBigRightLineFilled } from "react-icons/tb";
 
 const AddRepairOrderPage = () => {
   const { token } = useContext(AuthContext);
@@ -21,13 +23,8 @@ const AddRepairOrderPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const deviceTypes = [
-    "Smartphone",
     "Laptop",
-    "Tablet",
-    "Desktop Computer",
-    "Gaming Console",
-    "Smart Watch",
-    "Other"
+    "Desktop Computer"
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -125,7 +122,7 @@ const AddRepairOrderPage = () => {
                   name="brand"
                   value={formData.brand}
                   onChange={handleChange}
-                  placeholder="e.g., Apple, Samsung, HP"
+                  placeholder="e.g., Azus, Dell"
                   required
                 />
               </div>
@@ -138,7 +135,7 @@ const AddRepairOrderPage = () => {
                   name="model"
                   value={formData.model}
                   onChange={handleChange}
-                  placeholder="e.g., iPhone 13, Galaxy S21"
+                  placeholder="e.g., M15, M2"
                   required
                 />
               </div>
@@ -152,7 +149,7 @@ const AddRepairOrderPage = () => {
                 name="issue"
                 value={formData.issue}
                 onChange={handleChange}
-                placeholder="Brief description of the problem"
+                placeholder="Summary of the problem"
                 required
               />
             </div>
@@ -214,7 +211,7 @@ const AddRepairOrderPage = () => {
         <div className="modal-overlay">
           <div className="success-modal">
             <div className="modal-header">
-              <div className="success-icon">✅</div>
+              <div className="success-icon"><TbArrowBigRightLineFilled /></div>
               <h2>Request Submitted Successfully!</h2>
             </div>
             
@@ -232,19 +229,9 @@ const AddRepairOrderPage = () => {
                     onClick={copyToClipboard}
                     title="Copy to clipboard"
                   >
-                    📋
+                    <FaCopy />
                   </button>
                 </div>
-              </div>
-              
-              <div className="info-note">
-                <p><strong>What's next?</strong></p>
-                <ul>
-                  <li>You will receive an email confirmation shortly</li>
-                  <li>Our team will review your request within 24 hours</li>
-                  <li>You can track your repair status in your dashboard</li>
-                  <li>We'll contact you if we need any additional information</li>
-                </ul>
               </div>
             </div>
             

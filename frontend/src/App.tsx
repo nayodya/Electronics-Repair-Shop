@@ -25,7 +25,7 @@ import DashboardLayout from "./components/layouts/DashboardLayout";
 import ManageRequests from "./components/BodyContent/Dashboards/Admin/ManageRequests";
 
 import ManageUsers from "./components/BodyContent/Dashboards/Admin/ManageUsers";
-import CustomerDetails from "./components/BodyContent/Dashboards/Customer/Proofile";
+import CustomerDetails from "./components/BodyContent/Dashboards/Customer/CustomerProfile";
 import RepairingStatus from "./components/BodyContent/Dashboards/Technician/RepairingStatus";
 import ManagePayments from "./components/BodyContent/Dashboards/Admin/ManagePayments";
 import RepairPayments from "./components/BodyContent/Dashboards/Customer/RepairPayments";

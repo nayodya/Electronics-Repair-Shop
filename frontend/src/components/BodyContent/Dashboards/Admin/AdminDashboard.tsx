@@ -42,7 +42,6 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -263,11 +262,7 @@ const AdminDashboard: React.FC = () => {
       .slice(-6);
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchDashboardData();
-    setRefreshing(false);
-  };
+
 
   const quickActions: QuickAction[] = [
     {
@@ -291,13 +286,6 @@ const AdminDashboard: React.FC = () => {
       action: () => console.log('Navigate to payments'),
       color: '#ffc107'
     },
-    {
-      title: 'System Reports',
-      description: 'Generate system reports',
-      icon: '📊',
-      action: () => handleRefresh(),
-      color: '#17a2b8'
-    }
   ];
 
   const formatCurrency = (amount: number) => {
@@ -345,9 +333,7 @@ const AdminDashboard: React.FC = () => {
           <div className="error-icon">⚠️</div>
           <h2>Dashboard Error</h2>
           <p>{error}</p>
-          <button className="retry-button" onClick={handleRefresh}>
-            Try Again
-          </button>
+
         </div>
       </div>
     );
@@ -358,9 +344,6 @@ const AdminDashboard: React.FC = () => {
       <div className="admin-dashboard">
         <div className="no-data">
           <h2>No data available</h2>
-          <button className="retry-button" onClick={handleRefresh}>
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -373,13 +356,6 @@ const AdminDashboard: React.FC = () => {
           <h1>Admin Dashboard</h1>
           <p>Electronics Repair Shop Management System</p>
         </div>
-        <button 
-          className={`refresh-btn ${refreshing ? 'refreshing' : ''}`}
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          🔄 {refreshing ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
 
       {/* Key Metrics */}

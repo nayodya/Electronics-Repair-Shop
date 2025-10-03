@@ -45,6 +45,7 @@ const RepairPayments = () => {
   const [repairs, setRepairs] = useState<RepairRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
@@ -68,30 +69,30 @@ const RepairPayments = () => {
     }
   };
 
-  const getStatusColor = (status: string | undefined | null) => {
-    if (!status || typeof status !== 'string') return "status-default";
+  const getStatusClass = (status: string | undefined | null) => {
+    if (!status || typeof status !== 'string') return "received";
     
     switch (status.toLowerCase()) {
-      case "received": return "status-received";
-      case "inprogress": return "status-inprogress";
-      case "completed": return "status-completed";
-      case "readyfordelivery": return "status-ready";
-      case "delivered": return "status-delivered";
-      default: return "status-default";
+      case "received": return "received";
+      case "inprogress": return "inprogress";
+      case "completed": return "completed";
+      case "readyfordelivery": return "completed";
+      case "delivered": return "completed";
+      default: return "received";
     }
   };
 
-  const getPaymentStatusColor = (payment: Payment | null) => {
-    if (!payment) return "payment-no-quote";
-    if (payment.isPaid) return "payment-paid";
-    return "payment-pending";
+  const getPaymentStatusClass = (payment: Payment | null) => {
+    if (!payment) return "unpaid";
+    if (payment.isPaid) return "paid";
+    return "unpaid";
   };
 
   const getPaymentStatusText = (payment: Payment | null) => {
-    if (!payment) return "No Quote Yet";
-    if (payment.isPaid) return "Fully Paid";
-    if (payment.advancedPayment && payment.advancedPayment > 0) return "Partially Paid";
-    return "Payment Pending";
+    if (!payment) return "No Quote";
+    if (payment.isPaid) return "Paid";
+    if (payment.advancedPayment && payment.advancedPayment > 0) return "Partial";
+    return "Pending";
   };
 
   const formatCurrency = (amount: number) => {
@@ -105,9 +106,7 @@ const RepairPayments = () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
   };
 
@@ -120,7 +119,6 @@ const RepairPayments = () => {
   };
 
   const filteredRepairs = repairs.filter(repair => {
-    // Safe string operations with null checks
     const referenceNumber = repair.referenceNumber || "";
     const device = repair.device || "";
     const brand = repair.brand || "";
@@ -139,326 +137,247 @@ const RepairPayments = () => {
                           (paymentFilter === "pending" && repair.paymentDetails && !repair.paymentDetails.isPaid) ||
                           (paymentFilter === "no-quote" && !repair.paymentDetails);
 
-    return matchesSearch && matchesStatus && matchesPayment;
+    const matchesTab = activeTab === "all" || 
+                      (activeTab === "paid" && repair.paymentDetails?.isPaid) ||
+                      (activeTab === "pending" && repair.paymentDetails && !repair.paymentDetails.isPaid) ||
+                      (activeTab === "no-quote" && !repair.paymentDetails);
+
+    return matchesSearch && matchesStatus && matchesPayment && matchesTab;
   });
 
+  const getTabCount = (tab: string) => {
+    if (tab === "all") return repairs.length;
+    if (tab === "paid") return repairs.filter(r => r.paymentDetails?.isPaid).length;
+    if (tab === "pending") return repairs.filter(r => r.paymentDetails && !r.paymentDetails.isPaid).length;
+    if (tab === "no-quote") return repairs.filter(r => !r.paymentDetails).length;
+    return 0;
+  };
+
   const calculateTotals = () => {
-    const totalAmount = filteredRepairs
+    const totalAmount = repairs
       .filter(r => r.paymentDetails)
       .reduce((sum, r) => sum + (r.paymentDetails?.totalAmount || 0), 0);
 
-    const paidAmount = filteredRepairs
+    const paidAmount = repairs
       .filter(r => r.paymentDetails?.isPaid)
       .reduce((sum, r) => sum + (r.paymentDetails?.totalAmount || 0), 0);
 
-    const pendingAmount = filteredRepairs
+    const pendingAmount = repairs
       .filter(r => r.paymentDetails && !r.paymentDetails.isPaid)
       .reduce((sum, r) => sum + ((r.paymentDetails?.totalAmount || 0) - (r.paymentDetails?.advancedPayment || 0)), 0);
 
     return { totalAmount, paidAmount, pendingAmount };
   };
 
-  const { totalAmount, paidAmount, pendingAmount } = calculateTotals();
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setPaymentFilter("all");
+  };
 
   if (loading) {
-    return (
-      <div className="payments-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Loading payment details...</p>
-        </div>
-      </div>
-    );
+    return <div className="loading">Loading payment details...</div>;
   }
 
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
+
+  const { totalAmount, paidAmount, pendingAmount } = calculateTotals();
+
   return (
-    <div className="payments-container">
-      <div className="payments-header">
-        <button
-          className="back-button"
-          onClick={() => navigate("/customer/dashboard")}
+    <div className="manage-payments">
+      <div className="header">
+        <h1>My Payment History</h1>
+        <button 
+          className="btn-primary"
+          onClick={() => navigate("/customer/add-repair")}
         >
-          ← Back to Dashboard
+          + New Repair Request
         </button>
-        <div className="header-content">
-          <h1>Payment Details</h1>
-          <p>View and track payment information for your repair requests</p>
+      </div>
+
+      <div className="tabs">
+        <button 
+          className={`tab ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          All Payments ({getTabCount("all")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "paid" ? "active" : ""}`}
+          onClick={() => setActiveTab("paid")}
+        >
+          Paid ({getTabCount("paid")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "pending" ? "active" : ""}`}
+          onClick={() => setActiveTab("pending")}
+        >
+          Pending ({getTabCount("pending")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "no-quote" ? "active" : ""}`}
+          onClick={() => setActiveTab("no-quote")}
+        >
+          No Quote ({getTabCount("no-quote")})
+        </button>
+      </div>
+
+      <div className="filters-container">
+        <div className="filter-row">
+          <input
+            type="text"
+            placeholder="Search by reference number, device, brand or model..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Statuses</option>
+            <option value="received">Received</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="readyfordelivery">Ready for Delivery</option>
+            <option value="delivered">Delivered</option>
+          </select>
+          <select 
+            value={paymentFilter} 
+            onChange={(e) => setPaymentFilter(e.target.value)}
+          >
+            <option value="all">All Payments</option>
+            <option value="paid">Fully Paid</option>
+            <option value="pending">Payment Pending</option>
+            <option value="no-quote">No Quote Yet</option>
+          </select>
+          <button onClick={clearFilters}>Clear Filters</button>
         </div>
       </div>
 
-      {error && (
-        <div className="error-message">
-          <span className="error-icon">⚠️</span>
-          {error}
-        </div>
-      )}
-
-      {/* Payment Summary Cards */}
-      <div className="payments-summary">
-        <div className="summary-card total">
-          <div className="card-icon">💰</div>
-          <div className="card-content">
-            <h3>Total Quoted</h3>
-            <span className="summary-amount">{formatCurrency(totalAmount)}</span>
-            <span className="summary-count">{filteredRepairs.filter(r => r.paymentDetails).length} repairs</span>
-          </div>
-        </div>
-        
-        <div className="summary-card paid">
-          <div className="card-icon">✅</div>
-          <div className="card-content">
-            <h3>Paid Amount</h3>
-            <span className="summary-amount">{formatCurrency(paidAmount)}</span>
-            <span className="summary-count">{filteredRepairs.filter(r => r.paymentDetails?.isPaid).length} completed</span>
-          </div>
-        </div>
-        
-        <div className="summary-card pending">
-          <div className="card-icon">⏳</div>
-          <div className="card-content">
-            <h3>Pending Payment</h3>
-            <span className="summary-amount">{formatCurrency(pendingAmount)}</span>
-            <span className="summary-count">{filteredRepairs.filter(r => r.paymentDetails && !r.paymentDetails.isPaid).length} outstanding</span>
-          </div>
-        </div>
-        
-        <div className="summary-card no-quote">
-          <div className="card-icon">📋</div>
-          <div className="card-content">
-            <h3>Awaiting Quote</h3>
-            <span className="summary-amount">-</span>
-            <span className="summary-count">{filteredRepairs.filter(r => !r.paymentDetails).length} repairs</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="payments-filters">
-        <div className="search-bar">
-          <div className="search-input-container">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Search by reference number, device, brand, or model..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
-        </div>
-
-        <div className="filter-controls">
-          <div className="filter-group">
-            <label>Repair Status:</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="filter-select"
-            >
-              <option value="all">All Statuses</option>
-              <option value="received">Received</option>
-              <option value="inprogress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="readyfordelivery">Ready for Delivery</option>
-              <option value="delivered">Delivered</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label>Payment Status:</label>
-            <select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="filter-select"
-            >
-              <option value="all">All Payments</option>
-              <option value="paid">Fully Paid</option>
-              <option value="pending">Payment Pending</option>
-              <option value="no-quote">No Quote Yet</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Payment Details List */}
-      <div className="payments-list">
-        {filteredRepairs.length === 0 ? (
-          <div className="no-data">
-            <div className="no-data-icon">💳</div>
-            <h3>No repairs found</h3>
-            <p>No repair requests match your current filters.</p>
-            <button 
-              className="create-repair-btn"
-              onClick={() => navigate("/customer/add-repair")}
-            >
-              Submit New Repair Request
-            </button>
-          </div>
-        ) : (
-          filteredRepairs.map((repair) => (
-            <div key={repair.requestId} className="payment-card">
-              <div className="payment-card-header">
-                <div className="repair-info">
-                  <div className="reference-row">
-                    <h3 className="reference-number">#{repair.referenceNumber || "N/A"}</h3>
-                    <div className="status-badges">
-                      <span className={`status-badge ${getStatusColor(repair.status)}`}>
-                        {formatStatus(repair.status)}
-                      </span>
-                      <span className={`payment-badge ${getPaymentStatusColor(repair.paymentDetails)}`}>
-                        {getPaymentStatusText(repair.paymentDetails)}
-                      </span>
+      <div className="table-container">
+        <table className="payments-table">
+          <thead>
+            <tr>
+              <th>Reference #</th>
+              <th>Device</th>
+              <th>Repair Status</th>
+              <th>Payment Status</th>
+              <th>Total Amount</th>
+              <th>Paid Amount</th>
+              <th>Balance</th>
+              <th>Submitted Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRepairs.length === 0 ? (
+              <tr>
+                <td colSpan={9} style={{ textAlign: 'center', padding: '40px' }}>
+                  <div>
+                    <h3>No payment records found</h3>
+                    <p>
+                      {activeTab === "all" 
+                        ? "You haven't submitted any repair requests yet." 
+                        : `No payments with status "${activeTab}" found.`
+                      }
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              filteredRepairs.map((repair) => (
+                <tr key={repair.requestId}>
+                  <td data-label="Reference #">
+                    <strong>{repair.referenceNumber || "N/A"}</strong>
+                  </td>
+                  <td data-label="Device">
+                    <div>
+                      <strong>{repair.brand} {repair.model}</strong>
+                      <br />
+                      <small>{repair.device}</small>
                     </div>
-                  </div>
-                  
-                  <div className="device-info">
-                    <span className="device-name">{repair.brand || "Unknown"} {repair.model || "Unknown"}</span>
-                    <span className="device-type">({repair.device || "Unknown"})</span>
-                  </div>
-                  
-                  <p className="issue-summary">{repair.issue || "No issue description provided"}</p>
-                  
-                  <div className="timestamps">
-                    <span className="submitted-date">
-                      📅 Submitted: {repair.submittedAt ? formatDate(repair.submittedAt) : "Unknown"}
+                  </td>
+                  <td data-label="Repair Status">
+                    <span className={`status-badge ${getStatusClass(repair.status)}`}>
+                      {formatStatus(repair.status)}
                     </span>
-                    {repair.estimatedCompletionDays && (
-                      <span className="estimated-days">
-                        ⏱️ Est. {repair.estimatedCompletionDays} days
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  </td>
+                  <td data-label="Payment Status">
+                    <span className={`status-badge ${getPaymentStatusClass(repair.paymentDetails)}`}>
+                      {getPaymentStatusText(repair.paymentDetails)}
+                    </span>
+                  </td>
+                  <td data-label="Total Amount">
+                    {repair.paymentDetails ? formatCurrency(repair.paymentDetails.totalAmount) : "Pending Quote"}
+                  </td>
+                  <td data-label="Paid Amount">
+                    {repair.paymentDetails ? 
+                      formatCurrency((repair.paymentDetails.totalAmount || 0) - (repair.paymentDetails.remainingBalance || 0)) : 
+                      "-"
+                    }
+                  </td>
+                  <td data-label="Balance">
+                    {repair.paymentDetails ? 
+                      <span className={repair.paymentDetails.remainingBalance > 0 ? "text-danger" : "text-success"}>
+                        {formatCurrency(repair.paymentDetails.remainingBalance)}
+                      </span> : 
+                      "-"
+                    }
+                  </td>
+                  <td data-label="Submitted Date">
+                    {formatDate(repair.submittedAt)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredRepairs.length > 0 && (
+        <div className="statistics-container">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>Total Quoted</h3>
+              <p className="stat-number">{formatCurrency(totalAmount)}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Total Paid</h3>
+              <p className="stat-number success">{formatCurrency(paidAmount)}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Pending Balance</h3>
+              <p className="stat-number warning">{formatCurrency(pendingAmount)}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Repair Requests</h3>
+              <p className="stat-number">{repairs.length}</p>
+            </div>
+          </div>
+
+          <div className="monthly-stats">
+            <h3>Payment Summary</h3>
+            <div className="monthly-grid">
+              <div className="monthly-card">
+                <h4>Completed Payments</h4>
+                <p>Count: {repairs.filter(r => r.paymentDetails?.isPaid).length}</p>
+                <p>Amount: {formatCurrency(paidAmount)}</p>
               </div>
-
-              <div className="payment-card-body">
-                {repair.paymentDetails ? (
-                  <div className="payment-details">
-                    <div className="payment-breakdown">
-                      <div className="amount-section">
-                        <h4>💰 Payment Breakdown</h4>
-                        
-                        <div className="amount-rows">
-                          <div className="amount-row total">
-                            <span className="label">Total Quote:</span>
-                            <span className="amount">
-                              {formatCurrency(repair.paymentDetails.totalAmount || 0)}
-                            </span>
-                          </div>
-                          
-                          {repair.paymentDetails.advancedPayment && repair.paymentDetails.advancedPayment > 0 && (
-                            <div className="amount-row advanced">
-                              <span className="label">Advanced Payment:</span>
-                              <span className="amount">
-                                -{formatCurrency(repair.paymentDetails.advancedPayment)}
-                              </span>
-                            </div>
-                          )}
-                          
-                          <div className="amount-row remaining">
-                            <span className="label">Remaining Balance:</span>
-                            <span className={`amount ${(repair.paymentDetails.remainingBalance || 0) > 0 ? 'outstanding' : 'zero'}`}>
-                              {formatCurrency(repair.paymentDetails.remainingBalance || 0)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {repair.paymentDetails.paymentDate && (
-                        <div className="payment-date-section">
-                          <div className="payment-completed">
-                            <span className="completed-icon">✅</span>
-                            <div className="completed-info">
-                              <strong>Payment Completed</strong>
-                              <span className="payment-date">
-                                {formatDate(repair.paymentDetails.paymentDate)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {!repair.paymentDetails.isPaid && (repair.paymentDetails.remainingBalance || 0) > 0 && (
-                      <div className="payment-actions">
-                        <div className="payment-notice">
-                          <div className="notice-icon">💡</div>
-                          <div className="notice-content">
-                            <h5>Payment Required</h5>
-                            <p>
-                              Please complete your payment of{' '}
-                              <strong>{formatCurrency(repair.paymentDetails.remainingBalance || 0)}</strong>
-                            </p>
-                            <div className="payment-methods">
-                              <p><strong>Payment Options:</strong></p>
-                              <ul>
-                                <li>💳 Visit our office for card payment</li>
-                                <li>💰 Cash payment at pickup</li>
-                                <li>📞 Call us at (555) 123-4567 for other methods</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {repair.technician && (
-                      <div className="technician-info">
-                        <span className="technician-label">👨‍🔧 Assigned Technician:</span>
-                        <span className="technician-name">{repair.technician.name || "Unknown"}</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="no-payment-info">
-                    <div className="quote-pending">
-                      <div className="pending-icon">⏳</div>
-                      <div className="pending-content">
-                        <h4>Quote Pending</h4>
-                        <p>Our technicians are evaluating your device to provide an accurate repair quote.</p>
-                        <div className="quote-timeline">
-                          <div className="timeline-item active">
-                            <span className="timeline-dot">✅</span>
-                            <span>Device Received</span>
-                          </div>
-                          <div className="timeline-item current">
-                            <span className="timeline-dot">⏳</span>
-                            <span>Diagnosis in Progress</span>
-                          </div>
-                          <div className="timeline-item">
-                            <span className="timeline-dot">⭕</span>
-                            <span>Quote Preparation</span>
-                          </div>
-                          <div className="timeline-item">
-                            <span className="timeline-dot">⭕</span>
-                            <span>Customer Notification</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div className="monthly-card">
+                <h4>Outstanding Payments</h4>
+                <p>Count: {repairs.filter(r => r.paymentDetails && !r.paymentDetails.isPaid).length}</p>
+                <p>Amount: {formatCurrency(pendingAmount)}</p>
+              </div>
+              <div className="monthly-card">
+                <h4>Awaiting Quote</h4>
+                <p>Count: {repairs.filter(r => !r.paymentDetails).length}</p>
+                <p>Status: Under Evaluation</p>
               </div>
             </div>
-          ))
-        )}
-      </div>
-
-      {/* Help Section */}
-      <div className="help-section">
-        <h3>💡 Need Help?</h3>
-        <div className="help-content">
-          <div className="help-item">
-            <strong>📞 Phone:</strong> (555) 123-4567
-          </div>
-          <div className="help-item">
-            <strong>📧 Email:</strong> support@repairshop.com
-          </div>
-          <div className="help-item">
-            <strong>🕒 Business Hours:</strong> Mon-Fri 9:00 AM - 6:00 PM
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
