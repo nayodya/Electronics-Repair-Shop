@@ -22,8 +22,6 @@ public class User
     [Required]
     public required string Role { get; set; }
 
-    public string? GoogleId { get; set; }
-
 
     // Verification properties
     public string? VerificationToken { get; set; }
