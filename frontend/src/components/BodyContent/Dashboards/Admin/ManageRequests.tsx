@@ -402,14 +402,12 @@ const ManageRequests: React.FC = () => {
             <thead>
               <tr>
                 <th>Ref #</th>
-                <th>Customer</th>
                 <th>Device</th>
                 <th>Issue</th>
                 <th>Status</th>
                 <th>Payment</th>
                 <th>Technician</th>
                 <th>Est. Days</th>
-                <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -417,13 +415,6 @@ const ManageRequests: React.FC = () => {
               {filteredRequests.map((request) => (
                 <tr key={request.requestId}>
                   <td className="ref-number">{request.referenceNumber || 'N/A'}</td>
-                  <td>
-                    <div className="customer-info">
-                      <strong>{request.customerEmail?.split('@')[0] || 'Unknown'}</strong>
-                      <br />
-                      <small>{request.customerEmail || 'No email'}</small>
-                    </div>
-                  </td>
                   <td>
                     <div className="device-info">
                       <strong>{request.brand || ''} {request.model || ''}</strong>
@@ -519,9 +510,6 @@ const ManageRequests: React.FC = () => {
                       )}
                     </div>
                   </td>
-                  <td className="date-cell">
-                    {request.submittedAt ? new Date(request.submittedAt).toLocaleDateString() : 'N/A'}
-                  </td>
                   <td>
                     <div className="admin-actions">
                       <button 
@@ -529,7 +517,7 @@ const ManageRequests: React.FC = () => {
                         onClick={() => setSelectedRequest(request)}
                         disabled={loading}
                       >
-                        👁️ View
+                         View
                       </button>
                       <select 
                         onChange={(e) => {

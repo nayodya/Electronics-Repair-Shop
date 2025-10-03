@@ -16,7 +16,6 @@ interface RepairOrder {
   status: string;
   issueDescription: string;
   createdAt: string;
-  estimatedCost?: number;
   completedAt?: string;
 }
 
@@ -49,7 +48,6 @@ const RepairHistory = () => {
           status: mapStatus(item.status),
           issueDescription: item.description || item.issue || "",
           createdAt: item.submittedAt,
-          estimatedCost: item.estimatedCost,
           completedAt: item.completedAt,
         }));
         setOrders(mappedOrders);
@@ -68,6 +66,8 @@ const RepairHistory = () => {
       case 1: return "In Progress";
       case 2: return "Completed";
       case 3: return "Cancelled";
+      case 4: return "Ready for Delivery";
+      case 5: return "Delivered";
       default: return "Unknown";
     }
   };
@@ -78,16 +78,18 @@ const RepairHistory = () => {
       case "in progress": return "inprogress";
       case "completed": return "completed";
       case "cancelled": return "unpaid";
+      case "ready for delivery": return "readyfordelivery";
+      case "delivered": return "completed";
       default: return "received";
     }
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesTab = activeTab === "all" || order.status.toLowerCase().replace(" ", "") === activeTab;
+    const matchesTab = activeTab === "all" || order.status.toLowerCase().replace(" ", "").replace("for", "") === activeTab;
     const matchesSearch = order.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.device.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.device.model.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || order.status.toLowerCase().replace(" ", "") === statusFilter;
+    const matchesStatus = statusFilter === "all" || order.status.toLowerCase().replace(" ", "").replace("for", "") === statusFilter;
     const matchesDate = !dateFilter || order.createdAt.includes(dateFilter);
     
     return matchesTab && matchesSearch && matchesStatus && matchesDate;
@@ -95,7 +97,7 @@ const RepairHistory = () => {
 
   const getTabCount = (status: string) => {
     if (status === "all") return orders.length;
-    return orders.filter(order => order.status.toLowerCase().replace(" ", "") === status).length;
+    return orders.filter(order => order.status.toLowerCase().replace(" ", "").replace("for", "") === status).length;
   };
 
   const formatDate = (dateString: string) => {
@@ -158,6 +160,18 @@ const RepairHistory = () => {
           Completed ({getTabCount("completed")})
         </button>
         <button 
+          className={`tab ${activeTab === "readydelivery" ? "active" : ""}`}
+          onClick={() => setActiveTab("readydelivery")}
+        >
+          Ready for Delivery ({getTabCount("readydelivery")})
+        </button>
+        <button 
+          className={`tab ${activeTab === "delivered" ? "active" : ""}`}
+          onClick={() => setActiveTab("delivered")}
+        >
+          Delivered ({getTabCount("delivered")})
+        </button>
+        <button 
           className={`tab ${activeTab === "cancelled" ? "active" : ""}`}
           onClick={() => setActiveTab("cancelled")}
         >
@@ -181,6 +195,8 @@ const RepairHistory = () => {
             <option value="received">Received</option>
             <option value="inprogress">In Progress</option>
             <option value="completed">Completed</option>
+            <option value="readydelivery">Ready for Delivery</option>
+            <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
           </select>
           <input
@@ -202,7 +218,6 @@ const RepairHistory = () => {
               <th>Issue Description</th>
               <th>Status</th>
               <th>Submitted Date</th>
-              <th>Estimated Cost</th>
             </tr>
           </thead>
           <tbody>
@@ -255,9 +270,6 @@ const RepairHistory = () => {
                   <td data-label="Submitted Date">
                     {formatDate(order.createdAt)}
                   </td>
-                  <td data-label="Estimated Cost">
-                    {order.estimatedCost ? `$${order.estimatedCost.toFixed(2)}` : "Pending"}
-                  </td>
                 </tr>
               ))
             )}
@@ -275,7 +287,7 @@ const RepairHistory = () => {
             <div className="stat-card">
               <h3>Completed Orders</h3>
               <p className="stat-number success">
-                {orders.filter(o => o.status.toLowerCase() === "completed").length}
+                {orders.filter(o => o.status.toLowerCase() === "completed" || o.status.toLowerCase() === "delivered").length}
               </p>
             </div>
             <div className="stat-card">
@@ -286,13 +298,6 @@ const RepairHistory = () => {
             </div>
             <div className="stat-card">
               <h3>Total Spent</h3>
-              <p className="stat-number">
-                ${orders
-                  .filter(o => o.status.toLowerCase() === "completed" && o.estimatedCost)
-                  .reduce((sum, o) => sum + (o.estimatedCost || 0), 0)
-                  .toFixed(2)
-                }
-              </p>
             </div>
           </div>
         </div>

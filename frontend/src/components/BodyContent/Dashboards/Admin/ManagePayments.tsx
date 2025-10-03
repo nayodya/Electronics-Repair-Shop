@@ -6,7 +6,6 @@ interface Payment {
   paymentId: number;
   requestId: number;
   referenceNumber: string;
-  customerEmail: string;
   customerName: string;
   device: string;
   totalAmount: number;
@@ -230,10 +229,6 @@ const ManagePayments: React.FC = () => {
             <p className="stat-number success">{statistics.paidPayments}</p>
           </div>
           <div className="stat-card">
-            <h3>Pending Payments</h3>
-            <p className="stat-number warning">{statistics.pendingPayments}</p>
-          </div>
-          <div className="stat-card">
             <h3>Total Revenue</h3>
             <p className="stat-number">{formatCurrency(statistics.totalRevenue)}</p>
           </div>
@@ -278,26 +273,7 @@ const ManagePayments: React.FC = () => {
           value={filter.endDate || ''}
           onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
         />
-        <input
-          type="number"
-          placeholder="Min Amount"
-          value={filter.minAmount || ''}
-          onChange={(e) => setFilter({ ...filter, minAmount: parseFloat(e.target.value) || undefined })}
-        />
-        <input
-          type="number"
-          placeholder="Max Amount"
-          value={filter.maxAmount || ''}
-          onChange={(e) => setFilter({ ...filter, maxAmount: parseFloat(e.target.value) || undefined })}
-        />
-        <select
-          value={filter.isPaid === undefined ? '' : filter.isPaid.toString()}
-          onChange={(e) => setFilter({ ...filter, isPaid: e.target.value === '' ? undefined : e.target.value === 'true' })}
-        >
-          <option value="">All Payments</option>
-          <option value="true">Paid Only</option>
-          <option value="false">Unpaid Only</option>
-        </select>
+
         <button onClick={() => setFilter({})}>Clear Filters</button>
       </div>
     </div>
@@ -315,7 +291,6 @@ const ManagePayments: React.FC = () => {
             <th>Total Amount</th>
             <th>Advanced Payment</th>
             <th>Remaining</th>
-            <th>Status</th>
             <th>Payment Date</th>
             <th>Repair Status</th>
             <th>Actions</th>
@@ -329,18 +304,12 @@ const ManagePayments: React.FC = () => {
               <td>
                 <div>
                   <div>{payment.customerName}</div>
-                  <small>{payment.customerEmail}</small>
                 </div>
               </td>
               <td>{payment.device}</td>
               <td>{formatCurrency(payment.totalAmount)}</td>
               <td>{payment.advancedPayment ? formatCurrency(payment.advancedPayment) : '-'}</td>
               <td>{formatCurrency(payment.remainingBalance)}</td>
-              <td>
-                <span className={`status-badge ${payment.isPaid ? 'paid' : 'unpaid'}`}>
-                  {payment.isPaid ? 'Paid' : 'Unpaid'}
-                </span>
-              </td>
               <td>{formatDate(payment.paymentDate)}</td>
               <td>
                 <span className={`status-badge ${payment.repairStatus.toLowerCase()}`}>
@@ -403,24 +372,7 @@ const ManagePayments: React.FC = () => {
         >
           All Payments
         </button>
-        <button
-          className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pending')}
-        >
-          Pending Payments
-        </button>
-        <button
-          className={`tab ${activeTab === 'completed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('completed')}
-        >
-          Completed Payments
-        </button>
-        <button
-          className={`tab ${activeTab === 'statistics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('statistics')}
-        >
-          Statistics
-        </button>
+
       </div>
 
       {activeTab !== 'statistics' && renderFilters()}

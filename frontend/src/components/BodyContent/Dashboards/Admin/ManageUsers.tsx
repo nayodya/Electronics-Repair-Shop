@@ -311,21 +311,6 @@ const ManageUsers: React.FC = () => {
             <option value="verified">Verified</option>
             <option value="pending">Pending</option>
           </select>
-
-          <button 
-            className="users-btn users-btn-secondary users-btn-small"
-            onClick={clearFilters}
-          >
-            🗑️ Clear
-          </button>
-
-          <button 
-            className="users-btn users-btn-secondary users-btn-small"
-            onClick={fetchUsers}
-            disabled={loading}
-          >
-            🔄 Refresh
-          </button>
         </div>
       </div>
 

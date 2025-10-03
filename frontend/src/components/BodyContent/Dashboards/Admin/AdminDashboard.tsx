@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../../services/api';
 import './AdminDashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardStats {
   totalUsers: number;
@@ -14,7 +15,6 @@ interface DashboardStats {
   totalRevenue: number;
   pendingPayments: number;
   completedPayments: number;
-  averageCompletionTime: number;
   monthlyRepairs: Array<{
     month: string;
     count: number;
@@ -42,6 +42,7 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -120,10 +121,9 @@ const AdminDashboard: React.FC = () => {
           r.statusNumber === 4 || 
           (r.status && typeof r.status === 'string' && r.status.toLowerCase() === 'readyfordelivery')
         ).length,
-        totalRevenue: calculateTotalRevenue(repairs, payments),
+        totalRevenue: calculateTotalRevenue(repairs),
         pendingPayments: payments.filter(p => !p.isPaid).length,
         completedPayments: payments.filter(p => p.isPaid).length,
-        averageCompletionTime: calculateAverageCompletionTime(repairs),
         monthlyRepairs: processMonthlyData(repairs),
         recentRepairs: processRecentRepairs(repairs)
       };
@@ -139,20 +139,13 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const calculateTotalRevenue = (repairs: any[], payments: any[]): number => {
+  const calculateTotalRevenue = (repairs: any[]): number => {
     // Calculate from repairs that have payment amounts
     let revenue = 0;
     
     repairs.forEach(repair => {
       if (repair.hasPayment && repair.paymentAmount > 0) {
         revenue += repair.paymentAmount;
-      }
-    });
-
-    // Add from separate payments if available
-    payments.forEach(payment => {
-      if (payment.isPaid && payment.totalAmount > 0) {
-        revenue += payment.totalAmount;
       }
     });
 
@@ -202,28 +195,6 @@ const AdminDashboard: React.FC = () => {
     return 'Unknown';
   };
 
-  const calculateAverageCompletionTime = (repairs: any[]): number => {
-    const completedRepairs = repairs.filter(r => 
-      r.statusNumber === 2 || r.statusNumber === 4
-    );
-    
-    if (completedRepairs.length === 0) return 0;
-
-    const totalDays = completedRepairs.reduce((sum, repair) => {
-      try {
-        const submitted = new Date(repair.submittedAt);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - submitted.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return sum + diffDays;
-      } catch {
-        return sum; // Skip invalid dates
-      }
-    }, 0);
-
-    return Math.round(totalDays / completedRepairs.length);
-  };
-
   const processMonthlyData = (repairs: any[]): DashboardStats['monthlyRepairs'] => {
     const monthlyData: { [key: string]: { count: number; revenue: number } } = {};
     
@@ -265,28 +236,29 @@ const AdminDashboard: React.FC = () => {
 
 
   const quickActions: QuickAction[] = [
-    {
-      title: 'Manage Repairs',
-      description: 'View and manage repair requests',
-      icon: '🔧',
-      action: () => console.log('Navigate to repairs'),
-      color: '#007bff'
-    },
-    {
-      title: 'Manage Users',
-      description: 'Add, edit, or remove users',
-      icon: '👥',
-      action: () => console.log('Navigate to users'),
-      color: '#28a745'
-    },
-    {
-      title: 'View Payments',
-      description: 'Manage payment records',
-      icon: '💳',
-      action: () => console.log('Navigate to payments'),
-      color: '#ffc107'
-    },
-  ];
+  {
+    title: 'Manage Repairs',
+    description: 'View and manage repair requests',
+    icon: '🔧',
+    action: () => navigate('requests'),  
+    color: '#007bff'
+  },
+  {
+    title: 'Manage Users',
+    description: 'Add, edit, or remove users',
+    icon: '👥',
+    action: () => navigate('users'), 
+    color: '#28a745'
+  },
+  {
+    title: 'View Payments',
+    description: 'Manage payment records',
+    icon: '💳',
+    action: () => navigate('payments'), 
+    color: '#ffc107'
+  },
+];
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -416,10 +388,6 @@ const AdminDashboard: React.FC = () => {
             <span className="metric-label">Pending Repairs</span>
             <span className="metric-value">{stats.pendingRepairs}</span>
           </div>
-          <div className="metric-item">
-            <span className="metric-label">Avg. Completion</span>
-            <span className="metric-value">{stats.averageCompletionTime} days</span>
-          </div>
         </div>
       </div>
 
@@ -518,82 +486,9 @@ const AdminDashboard: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Status Distribution */}
-        <div className="dashboard-section">
-          <h2>Repair Status Distribution</h2>
-          <div className="status-distribution">
-            {stats.totalRepairs > 0 ? (
-              <>
-                <div className="status-item">
-                  <div className="status-bar">
-                    <div 
-                      className="status-fill pending"
-                      style={{ 
-                        width: `${(stats.pendingRepairs / stats.totalRepairs) * 100}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="status-info">
-                    <span>Pending ({stats.pendingRepairs})</span>
-                    <span>{Math.round((stats.pendingRepairs / stats.totalRepairs) * 100)}%</span>
-                  </div>
-                </div>
-                
-                <div className="status-item">
-                  <div className="status-bar">
-                    <div 
-                      className="status-fill progress"
-                      style={{ 
-                        width: `${(stats.inProgressRepairs / stats.totalRepairs) * 100}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="status-info">
-                    <span>In Progress ({stats.inProgressRepairs})</span>
-                    <span>{Math.round((stats.inProgressRepairs / stats.totalRepairs) * 100)}%</span>
-                  </div>
-                </div>
-                
-                <div className="status-item">
-                  <div className="status-bar">
-                    <div 
-                      className="status-fill completed"
-                      style={{ 
-                        width: `${(stats.completedRepairs / stats.totalRepairs) * 100}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="status-info">
-                    <span>Completed ({stats.completedRepairs})</span>
-                    <span>{Math.round((stats.completedRepairs / stats.totalRepairs) * 100)}%</span>
-                  </div>
-                </div>
-                
-                <div className="status-item">
-                  <div className="status-bar">
-                    <div 
-                      className="status-fill ready"
-                      style={{ 
-                        width: `${(stats.readyForDeliveryRepairs / stats.totalRepairs) * 100}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <div className="status-info">
-                    <span>Ready ({stats.readyForDeliveryRepairs})</span>
-                    <span>{Math.round((stats.readyForDeliveryRepairs / stats.totalRepairs) * 100)}%</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="no-data">
-                <p>No repair data for distribution</p>
-                <small>Charts will appear once repairs are created</small>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
+      <br />
+      <br />
     </div>
   );
 };

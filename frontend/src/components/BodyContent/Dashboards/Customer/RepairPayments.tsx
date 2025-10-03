@@ -22,7 +22,7 @@ interface RepairRequest {
   model: string;
   issue: string;
   description: string;
-  status: string;
+  status: number; // Added missing status field
   submittedAt: string;
   estimatedCompletionDays: number | null;
   customer: {
@@ -52,32 +52,82 @@ const RepairPayments = () => {
 
   useEffect(() => {
     fetchRepairs();
-  }, []);
+  }, [token]); // Added token dependency
 
   const fetchRepairs = async () => {
     try {
       setLoading(true);
-      const response = await api.get("Repair/my-requests", {
+      const response = await api.get("/Repair/my-requests", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setRepairs(response.data);
+      
+      console.log("Repairs API response:", response.data); // Debug log
+      
+      // Map the response to match our interface
+      const mappedRepairs: RepairRequest[] = response.data.map((item: any) => ({
+        requestId: item.requestId || item.id,
+        referenceNumber: item.referenceNumber || "N/A",
+        device: item.device || item.deviceType || "Unknown Device",
+        brand: item.brand || "Unknown Brand",
+        model: item.model || "Unknown Model",
+        issue: item.issue || item.description || "",
+        description: item.description || item.issue || "",
+        status: item.status || 0,
+        submittedAt: item.submittedAt || item.createdAt || new Date().toISOString(),
+        estimatedCompletionDays: item.estimatedCompletionDays || null,
+        customer: {
+          userId: item.customer?.userId || item.customerId || 0,
+          name: item.customer?.name || item.customerName || "Unknown",
+          email: item.customer?.email || item.customerEmail || "",
+          phoneNumber: item.customer?.phoneNumber || item.customerPhone || ""
+        },
+        technician: item.technician ? {
+          userId: item.technician.userId || 0,
+          name: item.technician.name || "Unassigned",
+          email: item.technician.email || ""
+        } : null,
+        paymentDetails: item.paymentDetails ? {
+          paymentId: item.paymentDetails.paymentId || 0,
+          requestId: item.requestId || item.id,
+          totalAmount: item.paymentDetails.totalAmount || 0,
+          advancedPayment: item.paymentDetails.advancedPayment || null,
+          remainingBalance: item.paymentDetails.remainingBalance || 0,
+          paymentDate: item.paymentDetails.paymentDate || null,
+          isPaid: item.paymentDetails.isPaid || false
+        } : null
+      }));
+      
+      console.log("Mapped repairs:", mappedRepairs); // Debug log
+      setRepairs(mappedRepairs);
     } catch (err: any) {
-      setError("Failed to fetch repair requests");
       console.error("Error fetching repairs:", err);
+      setError("Failed to fetch repair requests: " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusClass = (status: string | undefined | null) => {
-    if (!status || typeof status !== 'string') return "received";
-    
-    switch (status.toLowerCase()) {
-      case "received": return "received";
-      case "inprogress": return "inprogress";
-      case "completed": return "completed";
-      case "readyfordelivery": return "completed";
-      case "delivered": return "completed";
+  // Add status mapping functions
+  const getStatusLabel = (statusValue: number): string => {
+    switch (statusValue) {
+      case 0: return "Received";
+      case 1: return "In Progress";
+      case 2: return "Completed";
+      case 3: return "Cancelled";
+      case 4: return "Ready for Delivery";
+      case 5: return "Delivered";
+      default: return "Unknown";
+    }
+  };
+
+  const getStatusClass = (statusValue: number) => {
+    switch (statusValue) {
+      case 0: return "received";
+      case 1: return "inprogress";
+      case 2: return "completed";
+      case 3: return "unpaid";
+      case 4: return "readyfordelivery";
+      case 5: return "completed";
       default: return "received";
     }
   };
@@ -85,6 +135,7 @@ const RepairPayments = () => {
   const getPaymentStatusClass = (payment: Payment | null) => {
     if (!payment) return "unpaid";
     if (payment.isPaid) return "paid";
+    if (payment.advancedPayment && payment.advancedPayment > 0) return "partial";
     return "unpaid";
   };
 
@@ -110,27 +161,19 @@ const RepairPayments = () => {
     });
   };
 
-  const formatStatus = (status: string | undefined | null) => {
-    if (!status || typeof status !== 'string') return "Unknown";
-    
-    return status.replace(/([A-Z])/g, ' $1')
-                .replace(/^./, str => str.toUpperCase())
-                .trim();
-  };
-
   const filteredRepairs = repairs.filter(repair => {
     const referenceNumber = repair.referenceNumber || "";
     const device = repair.device || "";
     const brand = repair.brand || "";
     const model = repair.model || "";
-    const status = repair.status || "";
 
     const matchesSearch = referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          device.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          model.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || status.toLowerCase() === statusFilter.toLowerCase();
+    // Fix the status filter - it was referencing undefined 'status' variable
+    const matchesStatus = statusFilter === "all" || repair.status.toString() === statusFilter;
     
     const matchesPayment = paymentFilter === "all" || 
                           (paymentFilter === "paid" && repair.paymentDetails?.isPaid) ||
@@ -158,13 +201,23 @@ const RepairPayments = () => {
       .filter(r => r.paymentDetails)
       .reduce((sum, r) => sum + (r.paymentDetails?.totalAmount || 0), 0);
 
+    // Fix: Calculate paid amount correctly
     const paidAmount = repairs
-      .filter(r => r.paymentDetails?.isPaid)
-      .reduce((sum, r) => sum + (r.paymentDetails?.totalAmount || 0), 0);
+      .filter(r => r.paymentDetails)
+      .reduce((sum, r) => {
+        if (r.paymentDetails?.isPaid) {
+          // If fully paid, the paid amount is the total amount
+          return sum + (r.paymentDetails.totalAmount || 0);
+        } else if (r.paymentDetails?.advancedPayment) {
+          // If partially paid, add the advanced payment
+          return sum + (r.paymentDetails.advancedPayment || 0);
+        }
+        return sum;
+      }, 0);
 
     const pendingAmount = repairs
       .filter(r => r.paymentDetails && !r.paymentDetails.isPaid)
-      .reduce((sum, r) => sum + ((r.paymentDetails?.totalAmount || 0) - (r.paymentDetails?.advancedPayment || 0)), 0);
+      .reduce((sum, r) => sum + (r.paymentDetails?.remainingBalance || 0), 0);
 
     return { totalAmount, paidAmount, pendingAmount };
   };
@@ -237,11 +290,12 @@ const RepairPayments = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">All Statuses</option>
-            <option value="received">Received</option>
-            <option value="inprogress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="readyfordelivery">Ready for Delivery</option>
-            <option value="delivered">Delivered</option>
+            <option value="0">Received</option>
+            <option value="1">In Progress</option>
+            <option value="2">Completed</option>
+            <option value="3">Cancelled</option>
+            <option value="4">Ready for Delivery</option>
+            <option value="5">Delivered</option>
           </select>
           <select 
             value={paymentFilter} 
@@ -262,7 +316,6 @@ const RepairPayments = () => {
             <tr>
               <th>Reference #</th>
               <th>Device</th>
-              <th>Repair Status</th>
               <th>Payment Status</th>
               <th>Total Amount</th>
               <th>Paid Amount</th>
@@ -289,7 +342,7 @@ const RepairPayments = () => {
               filteredRepairs.map((repair) => (
                 <tr key={repair.requestId}>
                   <td data-label="Reference #">
-                    <strong>{repair.referenceNumber || "N/A"}</strong>
+                    <strong>{repair.referenceNumber}</strong>
                   </td>
                   <td data-label="Device">
                     <div>
@@ -298,11 +351,7 @@ const RepairPayments = () => {
                       <small>{repair.device}</small>
                     </div>
                   </td>
-                  <td data-label="Repair Status">
-                    <span className={`status-badge ${getStatusClass(repair.status)}`}>
-                      {formatStatus(repair.status)}
-                    </span>
-                  </td>
+
                   <td data-label="Payment Status">
                     <span className={`status-badge ${getPaymentStatusClass(repair.paymentDetails)}`}>
                       {getPaymentStatusText(repair.paymentDetails)}
@@ -313,7 +362,15 @@ const RepairPayments = () => {
                   </td>
                   <td data-label="Paid Amount">
                     {repair.paymentDetails ? 
-                      formatCurrency((repair.paymentDetails.totalAmount || 0) - (repair.paymentDetails.remainingBalance || 0)) : 
+                      (() => {
+                        if (repair.paymentDetails.isPaid) {
+                          return formatCurrency(repair.paymentDetails.totalAmount);
+                        } else if (repair.paymentDetails.advancedPayment) {
+                          return formatCurrency(repair.paymentDetails.advancedPayment);
+                        } else {
+                          return formatCurrency(0);
+                        }
+                      })() : 
                       "-"
                     }
                   </td>

@@ -228,10 +228,6 @@ const CustomerDashboard = () => {
     }
   };
 
-  const getDisplayName = (): string => {
-    if (user?.email) return user.email.split('@')[0];
-    return "Customer";
-  };
 
   const mapStatus = (status: number): string => {
     switch (status) {
@@ -297,7 +293,7 @@ const CustomerDashboard = () => {
     <div className="customer-dashboard">
       <div className="dashboard-header">
         <div className="welcome-section">
-          <h1>Welcome back, {getDisplayName()}!</h1>
+          <h1>Welcome back !</h1>
           <p>Manage your device repairs and track progress from your dashboard</p>
         </div>
         <div className="dashboard-stats">

@@ -1,3 +1,4 @@
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa6";
 import "./Footer.css";
 
 const Footer: React.FC = () => {
@@ -6,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="footer-container">
         <div className="footer-section">
           <div className="footer-brand">
-            <img src="" alt="Electronics Repair Shop" className="footer-logo" />
+            <img src="images/logo.png" alt="Electronics Repair Shop" className="footer-logo" />
             <h3>Electronics Repair Shop</h3>
             <p>Your trusted partner for all electronics repair needs. Quality service, guaranteed results.</p>
           </div>
@@ -49,11 +50,10 @@ const Footer: React.FC = () => {
         <div className="footer-section">
           <h4>Follow Us</h4>
           <div className="social-links">
-            <a href="#facebook" aria-label="Facebook"></a>
-            <a href="#twitter" aria-label="Twitter"></a>
-            <a href="#instagram" aria-label="Instagram"></a>
-            <a href="#linkedin" aria-label="LinkedIn"></a>
-            <a href="#youtube" aria-label="YouTube"></a>
+            <a href="#facebook" aria-label="Facebook"><FaFacebook /></a>
+            <a href="#twitter" aria-label="Twitter"><FaTwitter /></a>
+            <a href="#instagram" aria-label="Instagram"><FaInstagram /></a>
+            <a href="#linkedin" aria-label="LinkedIn"><FaLinkedin /></a>
           </div>
         </div>
       </div>
