@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlserver
+  namespace: ers-db
+  labels:
+    app: sqlserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+    spec:
+      containers:
+      - name: sqlserver
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: sql-port
+        env:
+        - name: ACCEPT_EULA
+          valueFrom:
+            configMapKeyRef:
+              name: sqlserver-config
+              key: ACCEPT_EULA
+        - name: MSSQL_PID
+          valueFrom:
+            configMapKeyRef:
+              name: sqlserver-config
+              key: MSSQL_PID
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sqlserver-secret
+              key: SA_PASSWORD
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: sqlserver-storage
+          mountPath: /var/opt/mssql
+        livenessProbe:
+          tcpSocket:
+            port: 1433
+          initialDelaySeconds: 45
+          periodSeconds: 15
+        readinessProbe:
+          tcpSocket:
+            port: 1433
+          initialDelaySeconds: 30
+          periodSeconds: 15
+      volumes:
+      - name: sqlserver-storage
+        persistentVolumeClaim:
+          claimName: sqlserver-pvc

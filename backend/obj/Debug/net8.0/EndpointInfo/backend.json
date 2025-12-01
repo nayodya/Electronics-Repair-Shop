@@ -961,37 +961,6 @@
         }
       }
     },
-    "/api/Auth/create-profile": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAccountDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAccountDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAccountDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Auth/my-account": {
       "get": {
         "tags": [
@@ -1463,39 +1432,6 @@
           "technicianId": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreateAccountDto": {
-        "required": [
-          "address",
-          "contactNumber",
-          "firstName",
-          "lastName"
-        ],
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "firstName": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "lastName": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "address": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "contactNumber": {
-            "minLength": 1,
-            "pattern": "^\\+?\\d{10,15}$",
-            "type": "string"
           }
         },
         "additionalProperties": false

@@ -502,22 +502,6 @@
   },
   {
     "ContainingType": "backend.Controllers.AuthController",
-    "Method": "CreateProfile",
-    "RelativePath": "api/Auth/create-profile",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "backend.Dto.CreateAccountDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "backend.Controllers.AuthController",
     "Method": "ForgotPassword",
     "RelativePath": "api/Auth/forgot-password",
     "HttpMethod": "POST",

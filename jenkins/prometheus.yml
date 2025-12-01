@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'jenkins-prometheus'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'jenkins'
+    static_configs:
+      - targets: ['jenkins:8080']
+    metrics_path: '/prometheus'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  - job_name: 'sonarqube'
+    static_configs:
+      - targets: ['sonarqube:9000']
+    metrics_path: '/api/ce/activity'
+
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['unix:///var/run/docker.sock']
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']

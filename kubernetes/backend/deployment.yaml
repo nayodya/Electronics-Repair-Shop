@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: ers-backend
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: backend:latest
+        imagePullPolicy: Never  # For minikube local development
+        ports:
+        - containerPort: 5062
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: ASPNETCORE_URLS
+          valueFrom:
+            configMapKeyRef:
+              name: api-config
+              key: ASPNETCORE_URLS
+        - name: ASPNETCORE_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: api-config
+              key: ASPNETCORE_ENVIRONMENT
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          valueFrom:
+            configMapKeyRef:
+              name: api-config
+              key: DOTNET_USE_POLLING_FILE_WATCHER
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: api-secret
+              key: ConnectionStrings__DefaultConnection
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: api-secret
+              key: JWT_SECRET
+        - name: SENDGRID_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secret
+              key: SENDGRID_API_KEY
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          tcpSocket:
+            port: 5062
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: 5062
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3

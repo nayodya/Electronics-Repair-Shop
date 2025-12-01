@@ -1,0 +1,238 @@
+# Jenkins Configuration for Electronics Repair Shop
+# This file defines Jenkins system configuration, credentials, and plugins
+
+# Jenkins System Configuration
+jenkins:
+  systemMessage: "Electronics Repair Shop CI/CD Pipeline"
+  
+  # Enable CSRF protection
+  crumbIssuer:
+    class: hudson.security.csrf.DefaultCrumbIssuer
+    excludeClientIPFromCrumb: false
+
+  # Security realm configuration
+  securityRealm:
+    class: hudson.security.HudsonPrivateSecurityRealm
+    allowsSignup: false
+
+# Global Pipeline Libraries
+unclassified:
+  globalLibraries:
+    libraries:
+      - name: "ers-shared-lib"
+        retriever:
+          modernSCM:
+            scm:
+              class: jenkins.plugins.sharedlibrary.github.GitHubSCMSource
+              credentialsId: "github-credentials"
+              repoOwner: "nayodya"
+              repository: "shared-jenkins-lib"
+              
+  # SonarQube Configuration
+  sonarGlobalConfiguration:
+    installations:
+      - name: "SonarQube"
+        serverUrl: "http://localhost:9000"
+        credentialsId: "sonarqube-credentials"
+        alwaysUseManagedLocation: false
+        webhookSecretId: "sonarqube-webhook-secret"
+
+  # Docker Registry Configuration
+  dockerRegistry:
+    url: "https://docker.io"
+    credentialsId: "docker-registry-credentials"
+
+  # Email Configuration
+  mailer:
+    charset: "UTF-8"
+    mailAccount:
+      address: "jenkins@electronicsrepairshop.com"
+      smtpHost: "smtp.gmail.com"
+      smtpPort: 587
+      useSsl: false
+      useTls: true
+      credentialsId: "email-credentials"
+    replyToAddress: "noreply@electronicsrepairshop.com"
+    
+  # Slack Integration
+  slackNotifier:
+    teamDomain: "electronicsrepair"
+    tokenCredentialId: "slack-webhook-token"
+    botUser: false
+
+# Credentials Configuration
+credentials:
+  system:
+    domainCredentials:
+      # GitHub Credentials
+      - credentials:
+          - class: com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
+            id: "github-credentials"
+            description: "GitHub API Credentials"
+            username: "${GITHUB_USERNAME}"
+            password: "${GITHUB_TOKEN}"
+            
+      # Docker Registry Credentials
+      - credentials:
+          - class: com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
+            id: "docker-registry-credentials"
+            description: "Docker Registry Credentials"
+            username: "${DOCKER_USERNAME}"
+            password: "${DOCKER_PASSWORD}"
+            
+      # SonarQube Credentials
+      - credentials:
+          - class: org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
+            id: "sonarqube-credentials"
+            description: "SonarQube Token"
+            secret: "${SONARQUBE_TOKEN}"
+            
+          - class: org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
+            id: "sonarqube-webhook-secret"
+            description: "SonarQube Webhook Secret"
+            secret: "${SONARQUBE_WEBHOOK_SECRET}"
+            
+      # Slack Webhook
+      - credentials:
+          - class: org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
+            id: "slack-webhook-token"
+            description: "Slack Webhook URL"
+            secret: "${SLACK_WEBHOOK_URL}"
+
+# Jenkins Plugins to Install
+plugins:
+  - id: "workflow-aggregator"
+    version: "575.v2c2e24a_10f23"
+    
+  - id: "docker-plugin"
+    version: "1.2.10"
+    
+  - id: "docker-pipeline"
+    version: "1.28"
+    
+  - id: "kubernetes"
+    version: "1.30.11"
+    
+  - id: "kubernetes-cli"
+    version: "1.10.4"
+    
+  - id: "sonarqube-generic-coverage"
+    version: "1.0.2"
+    
+  - id: "sonar"
+    version: "2.15"
+    
+  - id: "email-ext"
+    version: "2.98"
+    
+  - id: "slack"
+    version: "617.v82da_4c91fb_51"
+    
+  - id: "github-api"
+    version: "1.318-435.vc3d1c9e0e47d1"
+    
+  - id: "github-branch-source"
+    version: "1708.v2e52a_575f3a_c"
+    
+  - id: "pipeline-github-lib"
+    version: "27.gf1b_a_a_e8c"
+    
+  - id: "ghprb"
+    version: "1.42.2"
+    
+  - id: "timestamper"
+    version: "1.14"
+    
+  - id: "ansicolor"
+    version: "1.0.2"
+    
+  - id: "ws-cleanup"
+    version: "0.45"
+    
+  - id: "build-timeout"
+    version: "1.24"
+    
+  - id: "log-parser"
+    version: "2.1"
+    
+  - id: "performance"
+    version: "3.20"
+    
+  - id: "code-coverage-api"
+    version: "1.0.5"
+    
+  - id: "cobertura"
+    version: "1.16"
+    
+  - id: "htmlpublisher"
+    version: "1.32"
+    
+  - id: "junit"
+    version: "1.62"
+    
+  - id: "terraform"
+    version: "2.17.0"
+    
+  - id: "prometheus"
+    version: "2.0.11"
+    
+  - id: "role-strategy"
+    version: "566.v6073d9a_e4d4e"
+    
+  - id: "matrix-auth"
+    version: "3.1.5"
+
+# Pipeline Configuration
+pipelines:
+  # Main CI/CD Pipeline
+  - name: "ERS-Main-Pipeline"
+    description: "Main CI/CD pipeline for Electronics Repair Shop"
+    jenkinsFile: "Jenkinsfile"
+    scriptPath: "Jenkinsfile"
+    properties:
+      - pipelineGeneralJob:
+          description: "Main CI/CD Pipeline"
+          sandboxed: true
+      - pipelineTriggers:
+          - githubPush: {}
+          
+  # Multi-branch Pipeline
+  - name: "ERS-Multibranch"
+    description: "Multi-branch pipeline"
+    jenkinsFile: "jenkins/Jenkinsfile.multibranch"
+    scriptPath: "jenkins/Jenkinsfile.multibranch"
+    properties:
+      - pipelineMultiBranch:
+          description: "Multi-branch Pipeline"
+          
+# Security Settings
+security:
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "hudson.model.Item.Build:developers"
+        - "hudson.model.Item.Cancel:developers"
+        - "hudson.model.Item.Read:developers"
+        - "hudson.model.Item.Workspace:developers"
+        - "hudson.model.Run.Delete:administrators"
+        - "hudson.model.Run.Update:administrators"
+        - "hudson.model.View.Create:developers"
+        - "hudson.model.View.Delete:developers"
+        - "hudson.model.View.Read:developers"
+        - "hudson.model.View.Read:anonymous"
+        - "hudson.model.View.Read:developers"
+
+  # Disable script approval
+  scriptApproval:
+    aclApprovalRequired: false
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "H 2 * * 0"
+  retention: 30
+  excludePatterns:
+    - ".git"
+    - "node_modules"
+    - "bin"
+    - "obj"

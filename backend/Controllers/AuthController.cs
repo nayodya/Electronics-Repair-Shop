@@ -80,22 +80,6 @@ public class AuthController : ControllerBase
         }
     }
 
-    [Authorize]
-    [HttpPost("create-profile")]
-    public async Task<IActionResult> CreateProfile([FromBody] CreateAccountDto dto)
-    {
-        try
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            dto.UserId = userId;
-            await _authService.CreateProfileAsync(dto);
-            return Ok(new { message = "Profile created successfully." });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
 
     [Authorize]
     [HttpGet("my-account")]

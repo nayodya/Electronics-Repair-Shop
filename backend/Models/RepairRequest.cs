@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models;
 
-// Enum for the different states of a repair request
-// Add to your RepairRequest model if not already present
+
 public enum RepairStatus
 {
     Received = 0,

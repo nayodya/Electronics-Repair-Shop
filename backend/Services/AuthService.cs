@@ -111,21 +111,6 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
     }
 
-    public async Task CreateProfileAsync(CreateAccountDto dto)
-    {
-        var user = await _context.Users.FindAsync(dto.UserId);
-        if (user == null)
-        {
-            throw new Exception("User not found.");
-        }
-
-        user.FirstName = dto.FirstName;
-        user.LastName = dto.LastName;
-        user.Address = dto.Address;
-        user.ContactNumber = dto.ContactNumber;
-
-        await _context.SaveChangesAsync();
-    }
 
     private string GenerateJwtToken(User user)
     {
@@ -177,7 +162,8 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
     }
 
-
-
-
+    public Task CreateProfileAsync(CreateAccountDto dto)
+    {
+        throw new NotImplementedException();
+    }
 }
