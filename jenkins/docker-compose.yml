@@ -3,7 +3,10 @@ version: '3.8'
 services:
   # Jenkins Master
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jenkins-docker:lts-jdk17
     container_name: jenkins-master
     privileged: true
     user: root
