@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Add jenkins user to docker group
-RUN groupmod -g 999 docker || groupadd -g 999 docker && usermod -aG docker jenkins
+# Add jenkins user to docker group (group may already exist)
+RUN usermod -aG docker jenkins || true
 
 # Switch back to jenkins user
 USER jenkins
