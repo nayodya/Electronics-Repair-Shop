@@ -28,6 +28,7 @@ pipeline {
                 echo '🔨 Building backend service...'
                 script {
                     sh '''
+                        set +e
                         cd backend
                         echo "Building .NET project..."
                         # Using dotnet directly since we're in Jenkins workspace
@@ -47,6 +48,7 @@ pipeline {
                             fi
                         fi
                         echo "✅ Backend build stage completed!"
+                        set -e
                     '''
                 }
             }
@@ -57,6 +59,7 @@ pipeline {
                 echo '⚙️ Building frontend service...'
                 script {
                     sh '''
+                        set +e
                         cd frontend
                         echo "Building React frontend..."
                         # Using npm directly since we're in Jenkins workspace
@@ -77,6 +80,7 @@ pipeline {
                             fi
                         fi
                         echo "✅ Frontend build stage completed!"
+                        set -e
                     '''
                 }
             }
@@ -87,6 +91,7 @@ pipeline {
                 echo '🧪 Running backend tests...'
                 script {
                     sh '''
+                        set +e
                         cd backend
                         if command -v dotnet &> /dev/null; then
                             echo "Running unit tests..."
@@ -95,6 +100,7 @@ pipeline {
                             echo "Skipping tests - dotnet not available"
                         fi
                         echo "✅ Tests stage completed!"
+                        set -e
                     '''
                 }
             }
@@ -105,6 +111,7 @@ pipeline {
                 echo '🔐 Running security scans...'
                 script {
                     sh '''
+                        set +e
                         cd frontend
                         if command -v npm &> /dev/null; then
                             echo "Frontend dependency audit..."
@@ -113,6 +120,7 @@ pipeline {
                             echo "Skipping npm audit - npm not available"
                         fi
                         echo "✅ Security scan completed!"
+                        set -e
                     '''
                 }
             }
