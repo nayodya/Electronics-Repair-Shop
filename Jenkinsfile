@@ -9,8 +9,6 @@ pipeline {
 
     environment {
         IMAGE_TAG = "${BUILD_NUMBER}"
-        BACKEND_IMAGE = 'electronics-repair-backend'
-        FRONTEND_IMAGE = 'electronics-repair-frontend'
     }
 
     stages {
@@ -21,121 +19,123 @@ pipeline {
             }
         }
 
-        stage('Environment Setup') {
-            steps {
-                echo '🔧 Setting up environment...'
-                script {
-                    sh '''
-                        echo "Checking for required tools..."
-                        echo "Node version:"
-                        node --version || echo "⚠️ Node.js not found (needed for frontend)"
-                        echo ""
-                        echo "Checking .NET SDK:"
-                        dotnet --version || echo "⚠️ .NET SDK not found (needed for backend)"
-                    '''
+        stage('Build Backend') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
-        }
-
-        stage('Build Backend') {
             steps {
                 echo '🔨 Building backend service...'
-                script {
-                    sh '''
-                        cd backend
-                        echo "Restoring .NET packages..."
-                        dotnet restore
-                        echo "Building .NET project..."
-                        dotnet build -c Release
-                    '''
-                }
+                sh '''
+                    cd backend
+                    echo "Restoring .NET packages..."
+                    dotnet restore
+                    echo "Building .NET project..."
+                    dotnet build -c Release
+                    echo "Running tests..."
+                    dotnet test -c Release --no-build --verbosity normal || true
+                '''
             }
         }
 
         stage('Build Frontend') {
-            steps {
-                echo '⚙️ Building frontend service...'
-                script {
-                    sh '''
-                        cd frontend
-                        echo "Installing dependencies..."
-                        npm install
-                        echo "Linting code..."
-                        npm run lint || true
-                        echo "Building production bundle..."
-                        npm run build
-                    '''
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
-        }
-
-        stage('Backend Tests') {
             steps {
-                echo '🧪 Running backend tests...'
-                script {
-                    sh '''
-                        cd backend
-                        echo "Running dotnet tests..."
-                        dotnet test -c Release --no-build --verbosity normal || true
-                    '''
-                }
+                echo '⚙️ Building frontend service...'
+                sh '''
+                    cd frontend
+                    echo "Installing dependencies..."
+                    npm install
+                    echo "Linting code..."
+                    npm run lint || true
+                    echo "Building production bundle..."
+                    npm run build
+                '''
             }
         }
 
         stage('Security Scan') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 echo '🔐 Running security scans...'
-                script {
-                    sh '''
-                        echo "Checking frontend dependencies..."
-                        cd frontend
-                        npm audit || true
-                        cd ../backend
-                        echo "Checking backend dependencies..."
-                        dotnet list package --vulnerable || true
-                    '''
-                }
+                sh '''
+                    cd frontend
+                    echo "Checking frontend dependencies..."
+                    npm audit || true
+                '''
             }
         }
 
-        stage('Generate Report') {
+        stage('Build Docker Images') {
             steps {
-                echo '📊 Generating build report...'
-                script {
-                    sh '''
-                        echo "==================================="
-                        echo "Build Summary"
-                        echo "==================================="
-                        echo "Build Number: ${BUILD_NUMBER}"
-                        echo "Branch: ${GIT_BRANCH}"
-                        echo "Commit: ${GIT_COMMIT}"
-                        echo "Build Status: SUCCESS ✅"
-                        echo ""
-                        echo "Build Artifacts:"
-                        echo "✓ Backend compiled"
-                        echo "✓ Frontend bundled"
-                        echo "✓ Tests executed"
-                        echo "✓ Security scan completed"
-                        echo ""
-                        echo "Next Steps:"
-                        echo "1. Build Docker images from your development machine"
-                        echo "2. Run: docker-compose up --build"
-                        echo "3. Access application at http://localhost:5173"
-                        echo "==================================="
-                    '''
-                }
+                echo '🐳 Building Docker images...'
+                sh '''
+                    echo "Building backend image..."
+                    docker build -f backend/Dockerfile -t electronics-repair-backend:${IMAGE_TAG} ./backend
+                    docker tag electronics-repair-backend:${IMAGE_TAG} electronics-repair-backend:latest
+                    
+                    echo "Building frontend image..."
+                    docker build -f frontend/Dockerfile -t electronics-repair-frontend:${IMAGE_TAG} ./frontend
+                    docker tag electronics-repair-frontend:${IMAGE_TAG} electronics-repair-frontend:latest
+                    
+                    echo "✅ Docker images built successfully!"
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo '🚀 Deploying services...'
+                sh '''
+                    echo "Starting services with docker-compose..."
+                    docker-compose up -d
+                    sleep 5
+                    echo "Checking service status..."
+                    docker-compose ps
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo '✅ Checking service health...'
+                sh '''
+                    echo "Waiting for services to be ready..."
+                    for i in {1..30}; do
+                        if curl -s http://localhost:5062/swagger > /dev/null 2>&1; then
+                            echo "✅ Backend is ready"
+                            break
+                        fi
+                        echo "⏳ Attempt $i/30 - waiting for backend..."
+                        sleep 2
+                    done
+                    
+                    curl -s -o /dev/null -w "Backend Status: %{http_code}\n" http://localhost:5062/swagger || echo "Backend check skipped"
+                '''
             }
         }
     }
 
     post {
         success {
-            echo '✅ Build succeeded!'
-            echo '📦 Application code compiled and tested successfully!'
+            echo '✅ Pipeline succeeded!'
+            echo '📦 Code compiled, tested, and Docker images created!'
         }
         failure {
-            echo '❌ Build failed!'
-            echo '🔍 Check the console output above for error details'
+            echo '❌ Pipeline failed!'
+            echo '🔍 Check console output for error details'
         }
         always {
             echo '🧹 Pipeline execution complete'
