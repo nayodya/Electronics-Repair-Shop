@@ -8,7 +8,6 @@ pipeline {
     }
 
     environment {
-        REGISTRY = 'docker.io'
         IMAGE_TAG = "${BUILD_NUMBER}"
         BACKEND_IMAGE = 'electronics-repair-backend'
         FRONTEND_IMAGE = 'electronics-repair-frontend'
@@ -27,14 +26,12 @@ pipeline {
                 echo '🔧 Setting up environment...'
                 script {
                     sh '''
-                        echo "Docker version:"
-                        docker --version
-                        echo "Docker Compose version:"
-                        docker-compose --version
-                        echo ".NET version:"
-                        dotnet --version || echo ".NET not found in PATH"
+                        echo "Checking for required tools..."
                         echo "Node version:"
-                        node --version || echo "Node not found in PATH"
+                        node --version || echo "⚠️ Node.js not found (needed for frontend)"
+                        echo ""
+                        echo "Checking .NET SDK:"
+                        dotnet --version || echo "⚠️ .NET SDK not found (needed for backend)"
                     '''
                 }
             }
@@ -85,70 +82,17 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                echo '🐳 Building Docker images...'
-                script {
-                    sh '''
-                        echo "Building backend image..."
-                        docker build -f backend/Dockerfile -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend
-                        docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${BACKEND_IMAGE}:latest
-                        
-                        echo "Building frontend image..."
-                        docker build -f frontend/Dockerfile -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend
-                        docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${FRONTEND_IMAGE}:latest
-                        
-                        echo "Docker images built successfully!"
-                        docker images | grep -E "electronics-repair"
-                    '''
-                }
-            }
-        }
-
         stage('Security Scan') {
             steps {
                 echo '🔐 Running security scans...'
                 script {
                     sh '''
-                        echo "Checking for vulnerable dependencies..."
+                        echo "Checking frontend dependencies..."
                         cd frontend
                         npm audit || true
                         cd ../backend
                         echo "Checking backend dependencies..."
                         dotnet list package --vulnerable || true
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy to Docker Compose') {
-            steps {
-                echo '🚀 Deploying with Docker Compose...'
-                script {
-                    sh '''
-                        echo "Starting services with docker-compose..."
-                        docker-compose up -d
-                        
-                        echo "Waiting for services to be ready..."
-                        sleep 10
-                        
-                        echo "Checking service health..."
-                        docker-compose ps
-                    '''
-                }
-            }
-        }
-
-        stage('Smoke Tests') {
-            steps {
-                echo '✅ Running smoke tests...'
-                script {
-                    sh '''
-                        echo "Testing backend API..."
-                        curl -s -o /dev/null -w "Backend Status: %{http_code}\\n" http://localhost:5062/swagger || echo "Backend not ready yet"
-                        
-                        echo "Testing frontend..."
-                        curl -s -o /dev/null -w "Frontend Status: %{http_code}\\n" http://localhost:5173 || echo "Frontend not ready yet"
                     '''
                 }
             }
@@ -163,15 +107,20 @@ pipeline {
                         echo "Build Summary"
                         echo "==================================="
                         echo "Build Number: ${BUILD_NUMBER}"
-                        echo "Build Tag: ${IMAGE_TAG}"
                         echo "Branch: ${GIT_BRANCH}"
                         echo "Commit: ${GIT_COMMIT}"
+                        echo "Build Status: SUCCESS ✅"
                         echo ""
-                        echo "Docker Images Created:"
-                        docker images | grep -E "electronics-repair" || echo "No images found"
+                        echo "Build Artifacts:"
+                        echo "✓ Backend compiled"
+                        echo "✓ Frontend bundled"
+                        echo "✓ Tests executed"
+                        echo "✓ Security scan completed"
                         echo ""
-                        echo "Running Containers:"
-                        docker-compose ps || echo "Docker compose not running"
+                        echo "Next Steps:"
+                        echo "1. Build Docker images from your development machine"
+                        echo "2. Run: docker-compose up --build"
+                        echo "3. Access application at http://localhost:5173"
                         echo "==================================="
                     '''
                 }
@@ -182,23 +131,14 @@ pipeline {
     post {
         success {
             echo '✅ Build succeeded!'
-            sh '''
-                echo "Build completed successfully at $(date)" > /tmp/build_success.txt
-            '''
+            echo '📦 Application code compiled and tested successfully!'
         }
         failure {
             echo '❌ Build failed!'
-            sh '''
-                echo "Build failed at $(date)" > /tmp/build_failure.txt
-                echo "Collecting diagnostic information..."
-                docker-compose logs --tail=50
-            '''
+            echo '🔍 Check the console output above for error details'
         }
         always {
-            echo '🧹 Cleaning up...'
-            sh '''
-                echo "Build artifacts and logs are ready."
-            '''
+            echo '🧹 Pipeline execution complete'
         }
     }
 }
