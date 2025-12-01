@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+    
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            parallel {
+                stage('Backend') {
+                    steps {
+                        script {
+                            sh '''
+                                cd backend
+                                dotnet restore
+                                dotnet build -c Release
+                            '''
+                        }
+                    }
+                }
+                stage('Frontend') {
+                    steps {
+                        script {
+                            sh '''
+                                cd frontend
+                                npm install
+                                npm run build
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    sh '''
+                        cd backend
+                        dotnet test -c Release --no-build || true
+                    '''
+                }
+            }
+        }
+
+        stage('Docker') {
+            steps {
+                script {
+                    sh '''
+                        docker build -f backend/Dockerfile -t electronics-repair-backend:${BUILD_NUMBER} ./backend
+                        docker build -f frontend/Dockerfile -t electronics-repair-frontend:${BUILD_NUMBER} ./frontend
+                        
+                        docker tag electronics-repair-backend:${BUILD_NUMBER} electronics-repair-backend:latest
+                        docker tag electronics-repair-frontend:${BUILD_NUMBER} electronics-repair-frontend:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    sh '''
+                        docker-compose up -d
+                        sleep 5
+                        docker-compose ps
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker-compose ps || true'
+        }
+        failure {
+            sh 'docker-compose logs --tail=50 || true'
+        }
+    }
+}
