@@ -1,21 +1,22 @@
 pipeline {
-    agent none
+    agent any
     
     options {
-        timeout(time: 1, unit: 'HOURS')
+        timeout(time: 30, unit: 'MINUTES')
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     environment {
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        BACKEND_IMAGE = 'electronics-repair-backend'
-        FRONTEND_IMAGE = 'electronics-repair-frontend'
+        BUILD_NUMBER = "${BUILD_NUMBER}"
+        GIT_BRANCH = "${GIT_BRANCH}"
+        GIT_COMMIT = "${GIT_COMMIT}"
+        SA_PASSWORD = 'YourStrong@Password123'
+        DB_NAME = 'ElectronicsRepairShop'
     }
 
     stages {
         stage('Checkout') {
-            agent any
             steps {
                 echo '📥 Checking out code from repository...'
                 checkout scm
@@ -23,97 +24,107 @@ pipeline {
         }
 
         stage('Build Backend') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/dotnet/sdk:8.0'
-                    args '-v $WORKSPACE:/workspace -w /workspace'
-                }
-            }
             steps {
                 echo '🔨 Building backend service...'
                 script {
                     sh '''
-                        echo "Checking .NET version:"
-                        dotnet --version
                         cd backend
+                        echo "Checking .NET version:"
+                        docker run --rm -v $PWD:/src -w /src mcr.microsoft.com/dotnet/sdk:8.0 dotnet --version
+                        echo ""
                         echo "Restoring .NET packages..."
-                        dotnet restore
-                        echo "Building .NET project..."
-                        dotnet build -c Release
-                        echo "Running backend tests..."
-                        dotnet test -c Release --no-build --verbosity normal || true
+                        docker run --rm -v $PWD:/src -w /src mcr.microsoft.com/dotnet/sdk:8.0 dotnet restore
+                        echo ""
+                        echo "Building .NET project (Release)..."
+                        docker run --rm -v $PWD:/src -w /src mcr.microsoft.com/dotnet/sdk:8.0 dotnet build -c Release
+                        echo ""
+                        echo "✅ Backend build successful!"
                     '''
                 }
             }
         }
 
         stage('Build Frontend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    args '-v $WORKSPACE:/workspace -w /workspace'
-                }
-            }
             steps {
                 echo '⚙️ Building frontend service...'
                 script {
                     sh '''
-                        echo "Checking Node version:"
-                        node --version
-                        echo "Checking npm version:"
-                        npm --version
                         cd frontend
+                        echo "Checking Node version:"
+                        docker run --rm -v $PWD:/app -w /app node:20-alpine node --version
+                        echo ""
                         echo "Installing dependencies..."
-                        npm install
-                        echo "Linting code..."
-                        npm run lint || true
+                        docker run --rm -v $PWD:/app -w /app node:20-alpine npm install
+                        echo ""
+                        echo "Running linter..."
+                        docker run --rm -v $PWD:/app -w /app node:20-alpine npm run lint || true
+                        echo ""
                         echo "Building production bundle..."
-                        npm run build
+                        docker run --rm -v $PWD:/app -w /app node:20-alpine npm run build
+                        echo ""
+                        echo "✅ Frontend build successful!"
+                    '''
+                }
+            }
+        }
+
+        stage('Backend Tests') {
+            steps {
+                echo '🧪 Running backend tests...'
+                script {
+                    sh '''
+                        cd backend
+                        echo "Running unit tests..."
+                        docker run --rm -v $PWD:/src -w /src mcr.microsoft.com/dotnet/sdk:8.0 \
+                            dotnet test -c Release --no-build --verbosity normal || true
+                        echo ""
+                        echo "✅ Tests completed!"
                     '''
                 }
             }
         }
 
         stage('Security Scan') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    args '-v $WORKSPACE:/workspace -w /workspace'
-                }
-            }
             steps {
                 echo '🔐 Running security scans...'
                 script {
                     sh '''
-                        echo "Frontend security audit..."
+                        echo "Frontend dependency audit..."
                         cd frontend
-                        npm audit || true
+                        docker run --rm -v $PWD:/app -w /app node:20-alpine npm audit || true
+                        echo ""
+                        echo "✅ Security scan completed!"
                     '''
                 }
             }
         }
 
         stage('Generate Report') {
-            agent any
             steps {
                 echo '📊 Generating build report...'
                 script {
                     sh '''
-                        echo "==================================="
-                        echo "Build Summary"
-                        echo "==================================="
-                        echo "Build Number: ${BUILD_NUMBER}"
+                        echo ""
+                        echo "═════════════════════════════════════"
+                        echo "         BUILD REPORT"
+                        echo "═════════════════════════════════════"
+                        echo "Build #: ${BUILD_NUMBER}"
                         echo "Branch: ${GIT_BRANCH}"
                         echo "Commit: ${GIT_COMMIT}"
-                        echo "Build Status: SUCCESS ✅"
+                        echo "Status: ✅ SUCCESS"
                         echo ""
                         echo "Build Artifacts:"
-                        echo "✓ Backend compiled (.NET)"
-                        echo "✓ Frontend bundled (React)"
-                        echo "✓ Tests executed"
-                        echo "✓ Security scan completed"
+                        echo "  ✓ Backend compiled (.NET 8)"
+                        echo "  ✓ Frontend bundled (React 19)"
+                        echo "  ✓ Unit tests executed"
+                        echo "  ✓ Security audit completed"
                         echo ""
-                        echo "==================================="
+                        echo "Next Steps:"
+                        echo "  1. Run locally: docker-compose up --build"
+                        echo "  2. Backend API: http://localhost:5062"
+                        echo "  3. Frontend UI: http://localhost:5173"
+                        echo ""
+                        echo "═════════════════════════════════════"
                     '''
                 }
             }
@@ -122,21 +133,16 @@ pipeline {
 
     post {
         success {
-            node('') {
-                echo '✅ Build succeeded!'
-                echo '📦 Application code compiled and tested successfully!'
-            }
+            echo '✅ Pipeline succeeded!'
+            echo '📦 All stages completed successfully'
         }
         failure {
-            node('') {
-                echo '❌ Build failed!'
-                echo '🔍 Check the console output above for error details'
-            }
+            echo '❌ Pipeline failed!'
+            echo '🔍 Check console output above for errors'
         }
         always {
-            node('') {
-                echo '🧹 Pipeline execution complete'
-            }
+            echo '🧹 Cleaning up...'
+            sh 'echo "Build finished at $(date)"'
         }
     }
 }
