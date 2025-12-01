@@ -7,7 +7,6 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
-    environment {
         BUILD_NUMBER = "${BUILD_NUMBER}"
         GIT_BRANCH = "${GIT_BRANCH}"
         GIT_COMMIT = "${GIT_COMMIT}"
