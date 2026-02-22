@@ -6,12 +6,7 @@ metadata:
   labels:
     app: api
 spec:
-  replicas: 4
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  replicas: 1
   selector:
     matchLabels:
       app: api
@@ -26,58 +21,3 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 5062
-          name: http
-        - containerPort: 443
-          name: https
-        env:
-        - name: ASPNETCORE_URLS
-          valueFrom:
-            configMapKeyRef:
-              name: api-config
-              key: ASPNETCORE_URLS
-        - name: ASPNETCORE_ENVIRONMENT
-          valueFrom:
-            configMapKeyRef:
-              name: api-config
-              key: ASPNETCORE_ENVIRONMENT
-        - name: DOTNET_USE_POLLING_FILE_WATCHER
-          valueFrom:
-            configMapKeyRef:
-              name: api-config
-              key: DOTNET_USE_POLLING_FILE_WATCHER
-        - name: ConnectionStrings__DefaultConnection
-          valueFrom:
-            secretKeyRef:
-              name: api-secret
-              key: ConnectionStrings__DefaultConnection
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: api-secret
-              key: JWT_SECRET
-        - name: SENDGRID_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: api-secret
-              key: SENDGRID_API_KEY
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          tcpSocket:
-            port: 5062
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          tcpSocket:
-            port: 5062
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
