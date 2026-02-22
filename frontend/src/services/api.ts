@@ -7,8 +7,8 @@ const getBaseURL = () => {
         return import.meta.env.VITE_API_URL;
     }
     
-    // Default for local development and port-forwarded Minikube
-    return "http://localhost:3001/api";
+    // Default for local development - backend runs on port 5062
+    return "http://localhost:5062/api";
 };
 
 const api = axios.create({

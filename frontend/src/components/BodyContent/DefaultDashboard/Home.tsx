@@ -33,20 +33,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      <section className="photo-collage">
-        <div className="collage-grid">
-          <img src="/images/image1.jpg" alt="Repair 1" className="collage-image" />
-          <img src="/images/image2.jpg" alt="Repair 2" className="collage-image" />
-          <img src="/images/image3.jpg" alt="Repair 3" className="collage-image" />
-          <img src="/images/image4.jpg" alt="Repair 4" className="collage-image" />
-          <img src="/images/image5.jpeg" alt="Repair 5" className="collage-image" />
-          <img src="/images/image6.jpeg" alt="Repair 6" className="collage-image" />
-          <img src="/images/image7.jpg" alt="Repair 7" className="collage-image" />
-          <img src="/images/image8.jpeg" alt="Repair 8" className="collage-image" />
-          <img src="/images/image9.jpg" alt="Repair 9" className="collage-image" />
-          <img src="/images/image10.jpg" alt="Repair " className="collage-image" />
-        </div>
-      </section>
 
       {/* Services Section */}
       <section className="services-section">

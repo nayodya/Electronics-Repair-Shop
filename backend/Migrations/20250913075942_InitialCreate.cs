@@ -94,7 +94,7 @@ namespace backend.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Address", "ContactNumber", "Email", "EmailVerifiedAt", "FirstName", "LastName", "PasswordHash", "PasswordResetToken", "ResetTokenExpiresAt", "Role", "VerificationToken", "VerificationTokenExpiresAt" },
-                values: new object[] { 1, null, null, "admin@ers.com", new DateTime(2025, 9, 13, 7, 59, 40, 966, DateTimeKind.Utc).AddTicks(5139), "Admin", "User", "$2a$11$9RU0wLdNf.hY6htZlc3GhuRec5aMMRiDujLIItjOwdTKQMSARHzky", null, null, "Admin", null, null });
+                values: new object[] { 1, null, null, "admin@ers.com", new DateTime(2025, 2, 23, 0, 0, 0, 0, DateTimeKind.Utc), "Admin", "User", "$2a$11$9RU0wLdNf.hY6htZlc3GhuRec5aMMRiDujLIItjOwdTKQMSARHzky", null, null, "Admin", null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_RequestId",

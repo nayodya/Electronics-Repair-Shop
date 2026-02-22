@@ -6,11 +6,12 @@ metadata:
   labels:
     app: client
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: client
   ports:
   - name: http
     port: 5173
     targetPort: 5173
+    nodePort: 30173
     protocol: TCP

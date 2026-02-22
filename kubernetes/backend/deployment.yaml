@@ -6,7 +6,12 @@ metadata:
   labels:
     app: api
 spec:
-  replicas: 2
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: api
@@ -17,8 +22,8 @@ spec:
     spec:
       containers:
       - name: api
-        image: backend:latest
-        imagePullPolicy: Never  # For minikube local development
+        image: ersbackend:v1
+        imagePullPolicy: Never
         ports:
         - containerPort: 5062
           name: http

@@ -176,4 +176,3 @@ E:\Electronics Repair Shop\backend\bin\Debug\net8.0\BCrypt.Net-Next.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\Newtonsoft.Json.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\SendGrid.dll
 E:\Electronics Repair Shop\backend\bin\Debug\net8.0\StarkbankEcdsa.dll
-E:\Electronics Repair Shop\backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
