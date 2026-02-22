@@ -11,7 +11,6 @@ pipeline {
         BUILD_NUMBER = "${BUILD_NUMBER}"
         GIT_BRANCH = "${GIT_BRANCH}"
         GIT_COMMIT = "${GIT_COMMIT}"
-        SA_PASSWORD = 'YourStrong@Password123'
         DB_NAME = 'ElectronicsRepairShop'
     }
 
